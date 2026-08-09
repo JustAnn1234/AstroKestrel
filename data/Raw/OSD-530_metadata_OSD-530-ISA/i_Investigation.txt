@@ -1,0 +1,111 @@
+ONTOLOGY SOURCE REFERENCE
+Term Source Name	EFO	NCIT	OBI	MESH
+Term Source File	http://data.bioontology.org/ontologies/EFO		http://data.bioontology.org/ontologies/OBI	
+Term Source Version	132		29	
+Term Source Description	Experimental Factor Ontology		Ontology for Biomedical Investigations	
+INVESTIGATION
+Investigation Identifier	
+Investigation Title	
+Investigation Description	
+Investigation Submission Date	
+Investigation Public Release Date	
+INVESTIGATION PUBLICATIONS
+Investigation PubMed ID
+Investigation Publication DOI
+Investigation Publication Author List
+Investigation Publication Title
+Investigation Publication Status
+Investigation Publication Status Term Accession Number
+Investigation Publication Status Term Source REF
+INVESTIGATION CONTACTS
+Investigation Person Last Name
+Investigation Person First Name
+Investigation Person Mid Initials
+Investigation Person Email
+Investigation Person Phone
+Investigation Person Fax
+Investigation Person Address
+Investigation Person Affiliation
+Investigation Person Roles
+Investigation Person Roles Term Accession Number
+Investigation Person Roles Term Source REF
+STUDY
+Study Identifier	OSD-530
+Study Title	Cell-free RNA analysis of plasma samples collected from six astronauts in JAXA Cell-Free Epigenome (CFE) Study
+Study Description	A detailed understanding of how the human body responds to spaceflight will be important to develop countermeasures for long-term space exploration. Liquid biopsies offer minimally invasive alternatives to traditional tissue biopsies, while also permitting the extraction of cell-free nucleic acids, which may resolve molecular heterogeneity and extend the multi-omics scope better than standard methods. Full-body molecular profiling using cell-free nucleic acids isolated from liquid biopsies is hence one viable avenue for advancing space healthcare. Here, we perform a liquid biopsy study with six astronauts who resided on the International Space Station (ISS) for more than 120 days, and show that plasma cell-free RNA (cfRNA) can capture longitudinal gene expression responses of internal tissues to the spaceflight environment. Analysis of cfRNA collected before, during, and after spaceflight confirmed previously reported mitochondria dysregulation in space. Screening with 361 cell surface marker antibodies identified an extracellular mitochondria (exMT)-enriched fraction associated with the scavenger receptor CD36. RNA-sequencing analysis of the CD36 fraction revealed various tissue origins, some of which have not been well characterized due to their conventional inaccessibility. We compared our data to plasma cfRNA mouse data from a JAXA mission, in which on-board artificial gravity had been used, and discovered that microgravity induced the observed systemic responses. Our study used minimally invasive approaches to demonstrate exMT release as a conserved process in space and establishes the impact of gravity on Earth as an essential signal for normal homeostasis.
+Study Submission Date	13-Sep-2022
+Study Public Release Date	01-Dec-2022
+Study File Name	s_OSD-530.txt
+Comment[Acknowledgments]	
+Comment[DOI]	10.26030/r2xr-h714
+Comment[Data Source Accession]	
+Comment[Data Source Link]	
+Comment[Experiment Platform]	
+Comment[Flight Program]	
+Comment[Funding]	This study was supported by JAXA, NASA, and JSPS KAKENHI JP20H03234
+Comment[Identifiers]	
+Comment[Managing NASA Center]	
+Comment[Mission End]	
+Comment[Mission Link]	
+Comment[Mission Name]	
+Comment[Mission Start]	
+Comment[Project Identifier]	
+Comment[Project Link]	
+Comment[Project Title]	
+Comment[Project Type]	Spaceflight Study
+Comment[Space Program]	JAXA
+Comment[Study Grant Number]	
+STUDY DESIGN DESCRIPTORS
+Study Design Type	transcription profiling by high throughput sequencing
+Study Design Type Term Accession Number	http://www.ebi.ac.uk/efo/EFO_0002770
+Study Design Type Term Source REF	EFO
+STUDY PUBLICATIONS
+Study PubMed ID	38862469
+Study Publication DOI	10.1038/s41467-023-41995-z
+Study Publication Author List	Husna N, Aiba T, Fujita SI, Saito Y, Shiba D, Kudo T, Takahashi S, Furukawa S, Muratani M.
+Study Publication Title	Release of CD36-associated cell-free mitochondrial DNA and RNA as a hallmark of space environment response.
+Study Publication Status	published
+Study Publication Status Term Accession Number	http://www.ebi.ac.uk/efo/EFO_0001796
+Study Publication Status Term Source REF	EFO
+Comment[Study Publication Link]	https://doi.org/10.1038/s41467-023-41995-z
+STUDY FACTORS
+Study Factor Name	Spaceflight	Time
+Study Factor Type	Space Flight	time
+Study Factor Type Term Accession Number	http://purl.bioontology.org/ontology/MESH/D013026	http://www.ebi.ac.uk/efo/EFO_0000721
+Study Factor Type Term Source REF	MESH	EFO
+STUDY ASSAYS
+Study Assay File Name	a_OSD-530_transcription-profiling_rna-sequencing-(rna-seq)_illumina.txt	a_OSD-530_transcription-profiling_rna-sequencing-(rna-seq)_illumina-1.txt
+Study Assay Measurement Type	transcription profiling	transcription profiling
+Study Assay Measurement Type Term Accession Number	obo:OBI_0000424	obo:OBI_0000424
+Study Assay Measurement Type Term Source REF	OBI	OBI
+Study Assay Technology Type	RNA Sequencing (RNA-Seq)	RNA Sequencing (RNA-Seq)
+Study Assay Technology Type Term Accession Number	obo:OBI_0001271	obo:OBI_0001271
+Study Assay Technology Type Term Source REF	OBI	OBI
+Study Assay Technology Platform	Illumina	Illumina
+STUDY PROTOCOLS
+Study Protocol Name	sample collection	Nucleic Acid Extraction	Library Construction	Nucleic Acid Sequencing	Sequence Analysis Data Transformation	Nucleic Acid Extraction - CD36 plasma fraction	Sequence Analysis Data Transformation - CD36 plasma fraction
+Study Protocol Type	sample collection	Nucleic Acid Extraction	Library Construction	Nucleic Acid Sequencing	Sequence Analysis Data Transformation	Nucleic Acid Extraction	Sequence Analysis Data Transformation
+Study Protocol Type Term Accession Number							
+Study Protocol Type Term Source REF							
+Study Protocol Description	Study registration and ethics: The current human spaceflight study was proposed to and supported by the 2014 International Life Sciences Research Announcements, JAXA, and NASA. Ethics committee approvals were obtained at the University of Tsukuba (No. 251, Nov. 27, 2015), JAXA (JX-IRBA-20-071, Aug. 30, 2016), NASA (Pro1995, Feb. 28, 2017), ESA (2017_04_09, Apr. 20, 2017). Informed consent was obtained by the personal information manager of the study, and de-identified samples were made available to researchers who performed sample processing and data analysis. Sample collection and transportation: Human blood samples were collected using Vacutainer EDTA-plasma separate gel collection tubes (BD, cat. no. 362788) and frozen at -95°C (ISS) or -80°C (ground) after centrifugation for 30 min at 3,800 rpm (1,239 g, ISS) or 1,600 g (ground). Frozen samples were transported to the University of Tsukuba after all samples were collected from the six astronauts.	Plasma sample tubes were thawed on ice, aliquoted, and frozen at -80°C. Plasma sample aliquots (120 μl) were thawed on ice, centrifuged at 2,000 g for 10 min at 4°C to remove cellular debris, and 100 μl supernatants were transferred into fresh tubes with 1 ml TRIzol-LS (Life Technologies, cat. no. 10296028). 200 μl chloroform was added to the TRIzol sample, vortex mixed, and spun at 16,000 g for 15 min at 4°C. Supernatants were transferred into fresh tubes with 1 μl glycogen (10 mg/ml stock, Roche, cat. no. 1091393001). 500 μl isopropanol was added, mixed, and incubated for 10 min at room temperature. RNA pellets were recovered following centrifugation at 16,000 g for 15 min and the removal of supernatants. Pellets were washed twice with 80% ethanol. RNA was resuspended in 8 μl of water. RNA concentrations were measured using the Qubit RNA HS Assay Kit (Invitrogen, cat. no. Q32852).	Each sequencing library preparation used 2.5 μl of purified RNA. For the human plasma RNA and CD36-enriched RNA fractions, the SMART-seq Stranded Kit (Takara Bio, cat. no. 634443) was used at a half-volume scale following the user manual. The template amount was verified before the second PCR step by performing real-time PCR with the Fast SYBR Green Master Mix (Thermo Fisher Scientific, cat. no. 4385612) on a 1 μl aliquot of library reaction in order to adjust the PCR cycle for library amplification. PCR products were purified and eluted in 16 μl of Stranded Elution Buffer diluted with water at a 1:1 ratio.	2 x 36 base paired-end sequencing with NextSeq500 (Illumina) were performed.	Reads in FASTQ files were imported into CLC Genomics Workbench (CLC-GW, ver.10.1.1, Qiagen), mapped to human (hg19) reference genome, and quantified using a 57,773-gene annotation set (downloaded from the CLC-GW server) to obtain the total count values, which were combined into a table. To obtain normalized expression values, total counts were normalized by the scaling option in CLC-GW (normalization value equals mean, reference equals median mean, trimming 5%). Normalized total count values were log-2 transformed after adding a pseudocount of unity. RNAseq quantifications are provided in .xslx files as mean and standard error mean (SEM) of 6 astronauts. There are 3 sets of files: 3 group indicates pre-flight, in-flight, and post-flight. 9 group indicates 3 pre-flight timepoints being considered as one group and all the other individual groups of in-flight and post-flight timepoints. 11 group indicates all timepoints are considered as individual groups including 3 pre-flight timepoints. ANOVAs and Empirical analyses of DGEs were performed in CLC-GW for the 3 group data. Standard error of the mean was calculated by Microsoft Excel. For the 3 group (pre-flight, in-flight, and post-flight) comparison, the experiment range for each feature was calculated as the highest value minus the lowest value across all samples in all groups, the experiment difference was calculated as the average feature expression in the group with the highest average value minus the average feature expression in the group with the lowest average value, and the experiment fold change was calculated as the average feature expression in the group with the highest average value divided by the average feature expression in the group with the lowest average value. The experiment range, difference, and fold change was calculated using the original (raw) values, normalized values, or normalized and transformed values as indicated in the column headers of each .xlsx file. Feature filtering criteria are indicated in the .xlsx file names.	The 120 μl plasma aliquot was centrifuged to remove cell debris. The 100 μl supernatant was transferred into a fresh tube and combined with 650 μl of PBS, and 125 μl of the result was kept as input. The rest of the diluted plasma was combined with a diluted anti-CD36 antibody (LEGENDScreen Human PE Kit, BioLegend, cat. no. 700007, lot no. B328253, 6 μl of reconstituted antibody and 130 μl of PBS with 1 x BSA). The mixture was rotated at 4 °C for 1 hr. Then, 20 μl of washed protein G beads combined with the goat anti-IgM antibody was added, and rotated at 4 °C for 1 hr. The supernatant was removed, and beads were washed twice. Next, 1 ml 1 x TRIzol (diluted TRIzol-LS with H2O at 3:1 for 1x concentration) was added to the washed beads. 850 μl TRIzol-LS was added to the input. RNA was purified following the plasma RNA purification protocol.	Reads in FASTQ files were imported into CLC Genomics Workbench (CLC-GW, ver.10.1.1, Qiagen), mapped to human (hg19) reference genome, and quantified using a 57,773-gene annotation set (downloaded from the CLC-GW server) to obtain the total count values, which were combined into a table. To obtain normalized expression values, total counts were normalized by the scaling option in CLC-GW (normalization value equals mean, reference equals median mean, trimming 5%). Normalized total count values were log-2 transformed after adding a pseudocount of unity. Empirical analyses of DGEs was performed in CLC-GW.
+Study Protocol URI							
+Study Protocol Version							
+Study Protocol Parameters Name	Sample Preservation Method;Sample Storage Temperature	QA Instrument;QA Assay	Library Layout;Stranded	Sequencing Instrument;Read Length	differential expression analysis data transformation;Raw Counts Data;Normalized Counts Data	QA Instrument;QA Assay	differential expression analysis data transformation
+Study Protocol Parameters Name Term Accession Number	https://genelab-data.ndc.nasa.gov/;https://genelab-data.ndc.nasa.gov/	;	;	;http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl	http://purl.obolibrary.org/obo/OBI_0000650;https://osdr.nasa.gov/;https://osdr.nasa.gov/	;	http://purl.obolibrary.org/obo/OBI_0000650
+Study Protocol Parameters Name Term Source REF	;	;	;	;NCIT	OBI;;	;	OBI
+Study Protocol Components Name							
+Study Protocol Components Type							
+Study Protocol Components Type Term Accession Number							
+Study Protocol Components Type Term Source REF							
+STUDY CONTACTS
+Study Person Last Name	Muratani
+Study Person First Name	Masafumi
+Study Person Mid Initials	
+Study Person Email	muratanim@gmail.com
+Study Person Phone	
+Study Person Fax	
+Study Person Address	1-1-1, Tennodai, Tsukuba, Ibaraki, Japan
+Study Person Affiliation	University of Tsukuba
+Study Person Roles	Submitter
+Study Person Roles Term Accession Number	http://purl.obolibrary.org/obo/NCIT_C54269
+Study Person Roles Term Source REF	NCIT
