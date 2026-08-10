@@ -66,47 +66,53 @@ Built on NASA OSDR datasets from the **Inspiration4 mission** (OSD-575, OSD-530)
 
 ## AI Approach & Architecture
 
+```text
 NASA OSDR Data (OSD-575 + OSD-530)
-↓
+       │
+       ▼
 Data Loader (ml/data_loader.py)
-Parses astronaut IDs, mission timepoints,
-pre-flight baseline vs post-return phases
-↓
+   • Parses astronaut IDs, mission timepoints
+   • Pre-flight baseline vs post-return phases
+       │
+       ▼
 Anomaly Detection (ml/anomaly.py)
-Z-score deviation from personal pre-flight baseline
-Sigmoid normalisation → 0–1 risk scale
-Per-system scores: cardiovascular, immune, metabolic
-↓
+   • Z-score deviation from personal pre-flight baseline
+   • Sigmoid normalisation → 0–1 risk scale
+   • Per-system scores: cardiovascular, immune, metabolic
+       │
+       ▼
 SANS Module (ml/sans.py)
-20 SANS-relevant genes identified in RNA-seq data
-Neuro-ocular risk scoring: 4th body system
-↓
-Cross-System Risk Engine (ml/risk_engine.py) ← THE NOVEL LAYER
-Weighted composite scoring across all 4 systems
-Interaction penalty rules:
-• Cardiovascular + Immune → 1.4x penalty
-• SANS + Cardiovascular → 1.35x penalty
-• Triple cascade → 1.8x penalty
-Actionable intervention generation
-↓
+   • 20 SANS-relevant genes identified in RNA-seq data
+   • Neuro-ocular risk scoring: 4th body system
+       │
+       ▼
+Cross-System Risk Engine (ml/risk_engine.py)  <-- THE NOVEL LAYER
+   • Weighted composite scoring across all 4 systems
+   • Interaction penalty rules:
+       - Cardiovascular + Immune → 1.4x penalty
+       - SANS + Cardiovascular → 1.35x penalty
+       - Triple cascade → 1.8x penalty
+   • Actionable intervention generation
+       │
+       ▼
 Mars Mission Forecasting (ml/forecast.py)
-Polynomial trajectory fitting on post-return data
-180–500 day extrapolation
-Critical threshold day prediction
-Intervention timing recommendations
-↓
+   • Polynomial trajectory fitting on post-return data
+   • 180–500 day extrapolation
+   • Critical threshold day prediction
+   • Intervention timing recommendations
+       │
+       ▼
 FastAPI Backend (api/main.py)
-6 endpoints: dashboard, timeline, forecast, brief, alerts, chat
-↓
+   • 6 endpoints: dashboard, timeline, forecast, brief, alerts, chat
+       │
+       ▼
 React Dashboard (astrokestrel-frontend/)
-Dual-mode: Modern + NASA Flight Display
-Floating AI chat assistant (Ask AstroKestrel)
-Mission simulation slider (Day 1–500)
-4-system radar chart
-Real-time risk timeline
-
-
----
+   • Dual-mode: Modern + NASA Flight Display
+   • Floating AI chat assistant (Ask AstroKestrel)
+   • Mission simulation slider (Day 1–500)
+   • 4-system radar chart
+   • Real-time risk timeline
+```
 
 ## How IBM Bob Was Used
 
@@ -174,25 +180,24 @@ Open `http://localhost:5173`
 
 ## Project Structure
 
+```text
 AstroKestrel/
 ├── api/
-│ └── main.py # FastAPI backend, 6 endpoints
+│   └── main.py                    # FastAPI backend, 6 endpoints
 ├── ml/
-│ ├── data_loader.py # NASA OSDR data ingestion
-│ ├── anomaly.py # Z-score deviation risk scoring
-│ ├── risk_engine.py # Cross-system cascade detection
-│ ├── forecast.py # Mars mission trajectory forecasting
-│ └── sans.py # Neuro-ocular SANS risk module
+│   ├── data_loader.py             # NASA OSDR data ingestion
+│   ├── anomaly.py                 # Z-score deviation risk scoring
+│   ├── risk_engine.py             # Cross-system cascade detection
+│   ├── forecast.py                # Mars mission trajectory forecasting
+│   └── sans.py                    # Neuro-ocular SANS risk module
 ├── data/
-│ └── Raw/ # NASA OSDR datasets
+│   └── Raw/                       # NASA OSDR datasets
 ├── astrokestrel-frontend/
-│ └── src/
-│ └── App.jsx # React dashboard, dual-mode UI
+│   └── src/
+│       └── App.jsx                # React dashboard, dual-mode UI
 ├── requirements.txt
 └── README.md
-
-
----
+```
 
 ## NASA Datasets Used
 
