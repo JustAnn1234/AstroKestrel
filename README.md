@@ -9,7 +9,7 @@
 
 ## The Problem
 
-In 2030, astronauts will spend 18 months traveling to Mars. The biggest threat to that mission isn't a rocket failure — it's what space quietly does to the human body.
+NASA and SpaceX are actively planning the first crewed Mars mission. The journey takes 6 to 9 months each way. And the biggest threat to that mission isn't a rocket failure — it's what space quietly does to the human body.
 
 Bone density loss. Cardiovascular deconditioning. Immune dysregulation. Vision damage from rising intracranial pressure (SANS). These systems don't fail independently — they **cascade**. And NASA's current tools monitor each system in isolation, reacting to symptoms rather than predicting them.
 
