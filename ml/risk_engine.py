@@ -45,28 +45,21 @@ INTERACTION_RULES = [
         'threshold': 0.6,
         'penalty': 1.8,
         'description': 'CRITICAL: Triple cascade — cardiovascular stress, immune dysregulation and SANS onset detected simultaneously'
-    }
+    },
     {
         'systems': ['radiation', 'immune'],
         'threshold': 0.55,
         'penalty': 1.25,
-        'description': (
-            'Radiation-immune interaction: oxidative stress amplifying immune '
-            'dysregulation, consistent with published GCR exposure effects on '
-            'astronaut immune function'
-        )
+        'description': 'Radiation-immune interaction: oxidative stress amplifying immune dysregulation, consistent with published GCR exposure effects on astronaut immune function'
     },
     {
         'systems': ['radiation', 'cardiovascular', 'immune'],
         'threshold': 0.50,
         'penalty': 1.6,
-        'description': (
-            'CRITICAL: Radiation-mediated triple cascade — oxidative stress '
-            'driving simultaneous cardiovascular endothelial damage and '
-            'immune dysregulation'
-        )
+        'description': 'CRITICAL: Radiation-mediated triple cascade — oxidative stress driving simultaneous cardiovascular endothelial damage and immune dysregulation'
     },
 ]
+
 
 def compute_cross_system_risk(system_scores: dict) -> dict:
     base_score = sum(
@@ -107,6 +100,7 @@ def compute_cross_system_risk(system_scores: dict) -> dict:
         'system_scores': system_scores
     }
 
+
 def generate_interventions(risk_result: dict) -> list:
     interventions = []
     scores = risk_result['system_scores']
@@ -126,6 +120,13 @@ def generate_interventions(risk_result: dict) -> list:
             'action': 'Flag for medical review. Check for latent viral reactivation. Review sleep quality logs — immune dysregulation correlates with sleep disruption.'
         })
 
+    if scores.get('metabolic', 0) >= 0.5:
+        interventions.append({
+            'priority': 'MODERATE',
+            'system': 'Metabolic',
+            'action': 'Review electrolyte balance. Adjust caloric intake. Monitor glucose trends over next 48 hours.'
+        })
+
     if scores.get('neuro_ocular', 0) >= 0.6:
         interventions.append({
             'priority': 'HIGH',
@@ -137,20 +138,7 @@ def generate_interventions(risk_result: dict) -> list:
         interventions.append({
             'priority': 'HIGH',
             'system': 'Radiation / Oxidative Stress',
-            'action': (
-                'Review cumulative radiation exposure logs. '
-                'Increase antioxidant supplementation per mission protocol. '
-                'Monitor cognitive performance indicators — radiation-induced '
-                'CNS effects may lag behind biomarker elevation by days to weeks. '
-                'Consider EVA schedule review if exposure threshold approaching.'
-            )
-        })
-
-    if scores.get('metabolic', 0) >= 0.5:
-        interventions.append({
-            'priority': 'MODERATE',
-            'system': 'Metabolic',
-            'action': 'Review electrolyte balance. Adjust caloric intake. Monitor glucose trends over next 48 hours.'
+            'action': 'Review cumulative radiation exposure logs. Increase antioxidant supplementation per mission protocol. Monitor cognitive performance indicators — radiation-induced CNS effects may lag behind biomarker elevation by days to weeks. Consider EVA schedule review if exposure threshold approaching.'
         })
 
     if level == 'CRITICAL':
@@ -162,37 +150,11 @@ def generate_interventions(risk_result: dict) -> list:
 
     return interventions
 
-def generate_daily_brief(astronaut_id, day, risk_result, interventions):
-    level = risk_result['alert_level']
-    composite = risk_result['composite_risk']
-    scores = risk_result['system_scores']
-
-    brief = f"AstroKestrel DAILY BRIEF — Astronaut {astronaut_id} — Mission Day {day}\n"
-    brief += "=" * 60 + "\n"
-    brief += f"Overall Risk: {level} ({composite})\n\n"
-    brief += "System Status:\n"
-
-    for system, score in scores.items():
-        label = 'HIGH' if score >= 0.7 else 'MODERATE' if score >= 0.4 else 'LOW'
-        brief += f"  {system.capitalize():<20} {score:.3f}  [{label}]\n"
-
-    if risk_result['interactions_triggered']:
-        brief += "\nInteraction Alerts:\n"
-        for interaction in risk_result['interactions_triggered']:
-            brief += f"  ⚠ {interaction}\n"
-
-    if interventions:
-        brief += "\nRecommended Actions:\n"
-        for iv in interventions:
-            brief += f"  [{iv['priority']}] {iv['system']}: {iv['action']}\n"
-
-    return brief
 
 def should_suppress_alert(astronaut_id, tier, acknowledged_log, suppression_hours=4):
     """
-    Returns True if an alert at this tier for this astronaut was
-    acknowledged within the suppression window.
-    Prevents alert fatigue from repeated identical notifications.
+    Returns True if this alert tier for this astronaut was already
+    acknowledged within the suppression window — prevents alert fatigue.
     """
     if not acknowledged_log:
         return False
@@ -213,6 +175,34 @@ def should_suppress_alert(astronaut_id, tier, acknowledged_log, suppression_hour
             continue
 
     return False
+
+
+def generate_daily_brief(astronaut_id, day, risk_result, interventions):
+    level = risk_result['alert_level']
+    composite = risk_result['composite_risk']
+    scores = risk_result['system_scores']
+
+    brief = f"ASTROKESTREL DAILY BRIEF — Astronaut {astronaut_id} — Mission Day {day}\n"
+    brief += "=" * 60 + "\n"
+    brief += f"Overall Risk: {level} ({composite})\n\n"
+    brief += "System Status:\n"
+
+    for system, score in scores.items():
+        label = 'HIGH' if score >= 0.7 else 'MODERATE' if score >= 0.4 else 'LOW'
+        brief += f"  {system.capitalize():<25} {score:.3f}  [{label}]\n"
+
+    if risk_result['interactions_triggered']:
+        brief += "\nInteraction Alerts:\n"
+        for interaction in risk_result['interactions_triggered']:
+            brief += f"  ⚠ {interaction}\n"
+
+    if interventions:
+        brief += "\nRecommended Actions:\n"
+        for iv in interventions:
+            brief += f"  [{iv['priority']}] {iv['system']}: {iv['action']}\n"
+
+    return brief
+
 
 def run_full_mission_analysis(anomaly_results_df):
     astronauts = anomaly_results_df['astronaut_id'].unique()
@@ -250,6 +240,7 @@ def run_full_mission_analysis(anomaly_results_df):
 
     return pd.DataFrame(all_results)
 
+
 if __name__ == "__main__":
     import sys, os
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -261,19 +252,4 @@ if __name__ == "__main__":
     mission_results = run_full_mission_analysis(anomaly_results)
 
     print("\n=== MISSION RISK DASHBOARD ===")
-    print(mission_results[['astronaut_id', 'day', 'composite_risk',
-                            'alert_level', 'interactions',
-                            'interventions_needed']].to_string())
-
-    print("\n\n=== SAMPLE DAILY BRIEF ===")
-    c001_high = mission_results[
-        (mission_results['astronaut_id'] == 'C001') &
-        (mission_results['alert_level'].isin(['HIGH', 'CRITICAL']))
-    ]
-    if not c001_high.empty:
-        print(c001_high.iloc[0]['brief'])
-
-    print("\n=== CRITICAL ALERTS ACROSS MISSION ===")
-    critical = mission_results[mission_results['alert_level'].isin(['HIGH', 'CRITICAL'])]
-    print(critical[['astronaut_id', 'day', 'composite_risk',
-                    'alert_level', 'interventions_needed']].to_string())
+    print(mission_results[['astronaut_id', 'day', 'composite_risk', 'alert_level', 'interactions', 'interventions_needed']].to_string())
