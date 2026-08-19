@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 
 SYSTEM_WEIGHTS = {
-    'cardiovascular': 0.30,
-    'immune': 0.30,
-    'metabolic': 0.20,
-    'neuro_ocular': 0.20
+    'cardiovascular': 0.28,
+    'immune': 0.27,
+    'metabolic': 0.18,
+    'neuro_ocular': 0.17,
+    'radiation': 0.10
 }
 
 INTERACTION_RULES = [
@@ -45,6 +46,26 @@ INTERACTION_RULES = [
         'penalty': 1.8,
         'description': 'CRITICAL: Triple cascade — cardiovascular stress, immune dysregulation and SANS onset detected simultaneously'
     }
+    {
+        'systems': ['radiation', 'immune'],
+        'threshold': 0.55,
+        'penalty': 1.25,
+        'description': (
+            'Radiation-immune interaction: oxidative stress amplifying immune '
+            'dysregulation, consistent with published GCR exposure effects on '
+            'astronaut immune function'
+        )
+    },
+    {
+        'systems': ['radiation', 'cardiovascular', 'immune'],
+        'threshold': 0.50,
+        'penalty': 1.6,
+        'description': (
+            'CRITICAL: Radiation-mediated triple cascade — oxidative stress '
+            'driving simultaneous cardiovascular endothelial damage and '
+            'immune dysregulation'
+        )
+    },
 ]
 
 def compute_cross_system_risk(system_scores: dict) -> dict:
@@ -112,6 +133,19 @@ def generate_interventions(risk_result: dict) -> list:
             'action': 'Initiate visual acuity assessment. Monitor intraocular pressure. Review fluid restriction protocol — consider head-down tilt sleep position modification to reduce CSF pooling.'
         })
 
+    if scores.get('radiation', 0) >= 0.60:
+        interventions.append({
+            'priority': 'HIGH',
+            'system': 'Radiation / Oxidative Stress',
+            'action': (
+                'Review cumulative radiation exposure logs. '
+                'Increase antioxidant supplementation per mission protocol. '
+                'Monitor cognitive performance indicators — radiation-induced '
+                'CNS effects may lag behind biomarker elevation by days to weeks. '
+                'Consider EVA schedule review if exposure threshold approaching.'
+            )
+        })
+
     if scores.get('metabolic', 0) >= 0.5:
         interventions.append({
             'priority': 'MODERATE',
@@ -153,6 +187,32 @@ def generate_daily_brief(astronaut_id, day, risk_result, interventions):
             brief += f"  [{iv['priority']}] {iv['system']}: {iv['action']}\n"
 
     return brief
+
+def should_suppress_alert(astronaut_id, tier, acknowledged_log, suppression_hours=4):
+    """
+    Returns True if an alert at this tier for this astronaut was
+    acknowledged within the suppression window.
+    Prevents alert fatigue from repeated identical notifications.
+    """
+    if not acknowledged_log:
+        return False
+
+    from datetime import datetime, timedelta
+    cutoff = datetime.now() - timedelta(hours=suppression_hours)
+
+    for entry in acknowledged_log:
+        try:
+            ack_time = datetime.fromisoformat(entry.get('timestamp', ''))
+            if (
+                entry.get('astronaut') == astronaut_id
+                and tier in entry.get('action', '')
+                and ack_time > cutoff
+            ):
+                return True
+        except Exception:
+            continue
+
+    return False
 
 def run_full_mission_analysis(anomaly_results_df):
     astronauts = anomaly_results_df['astronaut_id'].unique()

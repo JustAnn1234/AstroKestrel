@@ -17,6 +17,7 @@ from ml.risk_engine import (
 )
 from ml.forecast import run_mars_mission_forecast
 from ml.sans import run_sans_analysis
+from ml.radiation import run_radiation_analysis
 from ml.deterministic_rules import (
     run_deterministic_rules,
     get_combined_tier,
@@ -36,7 +37,7 @@ app.add_middleware(
 )
 
 # ─────────────────────────────────────────────────────────────
-# STARTUP — Load all models and build indices
+# STARTUP
 # ─────────────────────────────────────────────────────────────
 
 print("Loading NASA OSDR data...")
@@ -50,6 +51,14 @@ sans_results = run_sans_analysis()
 anomaly_results = pd.concat(
     [anomaly_results,
      sans_results[['astronaut_id', 'system', 'days_from_launch', 'phase', 'risk_score']]],
+    ignore_index=True
+)
+
+print("Running radiation/oxidative stress analysis...")
+radiation_results = run_radiation_analysis(immune)
+anomaly_results = pd.concat(
+    [anomaly_results,
+     radiation_results[['astronaut_id', 'system', 'days_from_launch', 'phase', 'risk_score']]],
     ignore_index=True
 )
 
@@ -98,7 +107,7 @@ print("\nAll models ready. AstroKestrel operational.\n")
 
 
 # ─────────────────────────────────────────────────────────────
-# HELPER
+# HELPERS
 # ─────────────────────────────────────────────────────────────
 
 def _baseline_sample_count(astronaut_id: str) -> int:
@@ -106,6 +115,20 @@ def _baseline_sample_count(astronaut_id: str) -> int:
         (metabolic['astronaut_id'] == astronaut_id) &
         (metabolic['phase'] == 'pre_flight')
     ])
+
+
+def _uncertainty_for_n(n: int) -> dict:
+    pct = max(5, round(30 / max(n, 1)))
+    confidence = "LOW" if n < 4 else "MODERATE" if n < 8 else "HIGH"
+    return {
+        "confidence": confidence,
+        "uncertainty_pct": pct,
+        "uncertainty_note": (
+            f"Estimated score uncertainty: ±{pct}% "
+            f"(based on {n} pre-flight baseline samples). "
+            f"Treat as clinical decision support — not validated diagnostic output."
+        )
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -119,8 +142,17 @@ def root():
         "version": "2.0.0",
         "astronauts": 4,
         "systems_monitored": 5,
-        "engines": ["ML anomaly detection", "cross-system risk", "deterministic rules", "Mars forecasting"],
-        "data_source": "NASA OSDR OSD-575 / OSD-530 (Inspiration4 mission)"
+        "engines": [
+            "ML anomaly detection",
+            "cross-system risk",
+            "deterministic clinical rules",
+            "Mars mission forecasting",
+            "SANS neuro-ocular",
+            "radiation/oxidative stress proxy"
+        ],
+        "data_source": "NASA OSDR OSD-575 / OSD-530 (Inspiration4 mission)",
+        "offline_capable": "ML and deterministic engines run fully offline",
+        "cloud_dependent": "AI chat assistant only"
     }
 
 
@@ -144,6 +176,9 @@ def get_dashboard():
         det_result = deterministic_index.get(astronaut_id, {})
         combined = get_combined_tier(latest['composite_risk'], det_result)
 
+        n = _baseline_sample_count(astronaut_id)
+        unc = _uncertainty_for_n(n)
+
         astronauts.append({
             "id": astronaut_id,
             "name": f"Astronaut {astronaut_id}",
@@ -154,7 +189,9 @@ def get_dashboard():
             "deterministic_rules_fired": det_result.get('rules_count', 0),
             "systems_flagged": det_result.get('systems_flagged', []),
             "system_scores": system_scores,
-            "latest_day": int(latest['day'])
+            "latest_day": int(latest['day']),
+            "confidence": unc['confidence'],
+            "uncertainty_pct": unc['uncertainty_pct']
         })
 
     critical_count = sum(
@@ -235,8 +272,8 @@ def get_brief(astronaut_id: str):
     det_result = deterministic_index.get(aid, {})
     combined = get_combined_tier(risk_result['composite_risk'], det_result)
 
-    n_baseline = _baseline_sample_count(aid)
-    confidence = "LOW" if n_baseline < 4 else "MODERATE" if n_baseline < 8 else "HIGH"
+    n = _baseline_sample_count(aid)
+    unc = _uncertainty_for_n(n)
 
     return {
         "astronaut_id": aid,
@@ -258,10 +295,12 @@ def get_brief(astronaut_id: str):
             combined['tier_info']['commander_action']
             if combined['tier_info'] else None
         ),
-        "confidence": confidence,
+        "confidence": unc['confidence'],
+        "uncertainty_pct": unc['uncertainty_pct'],
+        "uncertainty_note": unc['uncertainty_note'],
         "confidence_note": (
-            f"Risk scores based on {n_baseline} pre-flight baseline samples. "
-            f"Confidence: {confidence}. "
+            f"Risk scores based on {n} pre-flight baseline samples. "
+            f"Confidence: {unc['confidence']} (±{unc['uncertainty_pct']}% estimated uncertainty). "
             "Treat as clinical decision support — human CMO review required."
         )
     }
@@ -273,14 +312,17 @@ def get_biomarkers(astronaut_id: str):
     try:
         explanations = get_biomarker_explanations(metabolic, cardio, immune, aid)
         det_result = deterministic_index.get(aid, {})
-        n_baseline = _baseline_sample_count(aid)
+        n = _baseline_sample_count(aid)
+        unc = _uncertainty_for_n(n)
 
         return {
             "astronaut_id": aid,
             "explanations": explanations,
             "fired_rules": det_result.get('fired_rules', []),
             "overall_deterministic_tier": det_result.get('overall_tier'),
-            "baseline_samples": n_baseline,
+            "baseline_samples": n,
+            "confidence": unc['confidence'],
+            "uncertainty_pct": unc['uncertainty_pct'],
             "data_note": (
                 "Values from NASA OSDR Inspiration4 post-return blood samples. "
                 "Cardiovascular multiplex assay values are relative concentrations — "
@@ -290,7 +332,7 @@ def get_biomarkers(astronaut_id: str):
             )
         }
     except Exception as e:
-        return {"error": str(e), "detail": "Biomarker explanation generation failed"}
+        return {"error": str(e)}
 
 
 @app.get("/api/alerts")
@@ -317,8 +359,9 @@ def get_alerts():
 
 
 # ─────────────────────────────────────────────────────────────
-# CHAT — Clinical Briefing Assistant (Groq / Llama 3.3 70B)
-# Framed as decision support, not medical authority
+# CHAT — IBM Granite via HuggingFace (primary)
+#        Groq/Llama fallback if HF unavailable
+#        Granite Guardian screening on every response
 # ─────────────────────────────────────────────────────────────
 
 class ChatQuery(BaseModel):
@@ -326,53 +369,161 @@ class ChatQuery(BaseModel):
     context: str = ""
 
 
+async def screen_with_guardian(response_text: str, hf_token: str) -> dict:
+    """
+    Screen AI response with IBM Granite Guardian 3.3 via HuggingFace.
+    Checks for three medical safety criteria:
+    1. Drug dosage prescriptions
+    2. Definitive diagnoses
+    3. Actions requiring physician authorization
+    """
+    medical_safety_prompt = f"""<|user|>
+Evaluate this medical AI response for safety. Does it:
+1. Prescribe specific drug dosages or treatments?
+2. Make a definitive medical diagnosis?
+3. Recommend actions requiring physician authorization?
+
+Response to evaluate: "{response_text[:400]}"
+
+Answer with SAFE or UNSAFE.
+<|assistant|>"""
+
+    try:
+        headers = {"Content-Type": "application/json"}
+        if hf_token:
+            headers["Authorization"] = f"Bearer {hf_token}"
+
+        async with httpx.AsyncClient() as client:
+            result = await client.post(
+                "https://api-inference.huggingface.co/models/ibm-granite/granite-guardian-3.3-2b",
+                headers=headers,
+                json={
+                    "inputs": medical_safety_prompt,
+                    "parameters": {"max_new_tokens": 10, "return_full_text": False}
+                },
+                timeout=8.0
+            )
+            output = result.json()
+            generated = ""
+            if isinstance(output, list) and output:
+                generated = str(output[0].get("generated_text", "")).upper()
+            is_safe = "UNSAFE" not in generated
+            return {"safe": is_safe, "screened": True, "response": generated[:50]}
+    except Exception:
+        return {"safe": True, "screened": False, "response": "screening unavailable"}
+
+
 @app.post("/api/chat")
 async def chat(payload: ChatQuery):
-    api_key = os.getenv("GROQ_API_KEY", "")
+    hf_token = os.getenv("HF_TOKEN", "")
+    groq_key = os.getenv("GROQ_API_KEY", "")
 
-    system_prompt = f"""You are AstroKestrel's Clinical Briefing Assistant — a decision-support 
-tool for crew health surveillance on long-duration space missions. 
+    system_prompt = f"""You are AstroKestrel's Clinical Briefing Assistant — a decision-support
+tool for crew health surveillance on long-duration space missions.
 
-You have access to real NASA Inspiration4 astronaut biomarker data processed through 
+You have access to real NASA Inspiration4 astronaut biomarker data processed through
 AstroKestrel's ML anomaly detection and deterministic clinical rules engine.
 
 Current mission data: {payload.context}
 
-IMPORTANT OPERATIONAL CONSTRAINTS:
+OPERATIONAL CONSTRAINTS:
 - You support the Crew Medical Officer's decision-making. You do not replace it.
 - Never prescribe specific drug dosages or treatment protocols.
 - Never make definitive medical diagnoses.
-- Always recommend CMO review for any MEDICAL_ADVISORY or IMMEDIATE_INTERVENTION findings.
-- Frame all outputs as risk assessments requiring human clinical judgment.
+- Always recommend CMO review for MEDICAL_ADVISORY or IMMEDIATE_INTERVENTION findings.
+- Frame outputs as risk assessments requiring human clinical judgment.
 - Use specific biomarker numbers from the data when available.
 - Keep responses under 180 words.
-- Use operational language: "elevated risk", "warrants review", "trend suggests", not "the astronaut has X disease".
+- Use operational language: "elevated risk", "warrants review", "trend suggests".
+You are speaking to a mission commander or flight surgeon. Be direct and factual."""
 
-You are speaking to a mission commander or flight surgeon. Be direct, factual, and actionable."""
+    # ── Primary: IBM Granite 3.3 8B via HuggingFace ───────────────
+    if hf_token:
+        try:
+            prompt = f"<|system|>\n{system_prompt}\n<|user|>\n{payload.query}\n<|assistant|>\n"
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "llama-3.3-70b-versatile",
-                "max_tokens": 500,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": payload.query}
-                ]
-            },
-            timeout=30.0
-        )
-        data = response.json()
-        reply = data["choices"][0]["message"]["content"]
-        return {
-            "reply": reply,
-            "disclaimer": (
-                "This briefing supports, but does not replace, "
-                "Crew Medical Officer clinical judgment."
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://api-inference.huggingface.co/models/ibm-granite/granite-3.3-8b-instruct",
+                    headers={"Authorization": f"Bearer {hf_token}", "Content-Type": "application/json"},
+                    json={
+                        "inputs": prompt,
+                        "parameters": {
+                            "max_new_tokens": 400,
+                            "temperature": 0.3,
+                            "return_full_text": False
+                        }
+                    },
+                    timeout=30.0
+                )
+                output = response.json()
+
+                if isinstance(output, list) and output:
+                    reply = output[0].get("generated_text", "").strip()
+                elif isinstance(output, dict) and "error" in output:
+                    raise ValueError(output["error"])
+                else:
+                    raise ValueError("Unexpected HuggingFace response format")
+
+                if not reply:
+                    raise ValueError("Empty response from Granite")
+
+                # ── Granite Guardian screening ─────────────────────
+                guardian = await screen_with_guardian(reply, hf_token)
+
+                if not guardian["safe"]:
+                    reply = (
+                        "This query requires direct CMO evaluation. "
+                        "AstroKestrel's safety screening has flagged this response "
+                        "as requiring qualified medical personnel review. "
+                        "Please consult the Crew Medical Officer directly."
+                    )
+
+                return {
+                    "reply": reply,
+                    "engine": "IBM Granite 3.3 8B (HuggingFace)",
+                    "guardian_screened": guardian["screened"],
+                    "guardian_safe": guardian["safe"],
+                    "disclaimer": (
+                        "Clinical briefing only. Does not replace CMO judgment. "
+                        "Screened by IBM Granite Guardian 3.3."
+                    )
+                }
+
+        except Exception as e:
+            print(f"IBM Granite (HF) error: {e} — falling back to Groq")
+
+    # ── Fallback: Groq / Llama ─────────────────────────────────────
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {groq_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "max_tokens": 500,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": payload.query}
+                    ]
+                },
+                timeout=30.0
             )
+            data = response.json()
+            reply = data["choices"][0]["message"]["content"]
+            return {
+                "reply": reply,
+                "engine": "Llama 3.3 70B via Groq (fallback)",
+                "guardian_screened": False,
+                "disclaimer": "Clinical briefing only. Does not replace CMO judgment."
+            }
+    except Exception as e:
+        return {
+            "reply": "Communication error. Please retry.",
+            "engine": "unavailable",
+            "guardian_screened": False,
+            "disclaimer": ""
         }

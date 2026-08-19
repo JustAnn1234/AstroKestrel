@@ -606,7 +606,7 @@ function Dashboard({ flight, setFlight }) {
       <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "1.5rem 2rem" }}>
         {flight && (
           <div style={{ fontFamily: "monospace", fontSize: "10px", color: "#00aa55", marginBottom: "1rem", letterSpacing: "0.08em" }}>
-            SYSTEM: ASTROKESTREL-MHI-v2.0 | DATA: NASA-OSDR OSD-575/OSD-530 | CREW: INSPIRATION4 | ENGINES: ML+DETERMINISTIC | STATUS: NOMINAL
+            SYSTEM: ASTROKESTREL-MHI-v2.0 | DATA: NASA-OSDR OSD-575/OSD-530 | CREW: INSPIRATION4 | ML+DETERMINISTIC: OFFLINE-CAPABLE | CHAT: CLOUD-DEPENDENT | STATUS: NOMINAL
           </div>
         )}
 
@@ -624,6 +624,12 @@ function Dashboard({ flight, setFlight }) {
             </div>
           ))}
         </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.5rem" }}>
+  <div style={{ fontSize: "10px", color: "#475569", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "6px", padding: "4px 10px" }}>
+    🔒 ML models run offline · AI chat requires connection
+  </div>
+</div>
 
         <div style={{ marginBottom: "0.75rem", fontSize: "11px", color: flight ? "#00aa55" : "#64748b", fontFamily: flight ? "monospace" : "inherit" }}>
           {flight
