@@ -2,10 +2,10 @@
 
 ### Crew Health Surveillance & Clinical Decision Support for Deep Space Missions
 
-> **IBM AI Builders Challenge — August 2026**
-> Theme: Advance Space Exploration with AI
-> Built by: Omosomi Ann Hassan
-> Live Demo: [astro-kestrel.vercel.app](https://astro-kestrel.vercel.app/)
+> **IBM AI Builders Challenge — August 2026** <br>
+> Theme: Advance Space Exploration with AI <br>
+> Built by: Omosomi Ann Hassan <br>
+> Live Demo: [astro-kestrel.vercel.app](https://astro-kestrel.vercel.app/) <br>
 > GitHub: [github.com/JustAnn1234/AstroKestrel](https://github.com/JustAnn1234/AstroKestrel)
 
 ---
