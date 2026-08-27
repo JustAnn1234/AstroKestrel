@@ -1,208 +1,240 @@
 # 🦅 AstroKestrel
-### AI-Powered Astronaut Physiological Risk Intelligence System
+
+### Crew Health Surveillance & Clinical Decision Support for Deep Space Missions
 
 > **IBM AI Builders Challenge — August 2026**  
 > Theme: Advance Space Exploration with AI  
-> Built by: Omosomi Ann Hassan
+> Built by: Omosomi Ann Hassan  
+> Live Demo: [astrokestrel.vercel.app](https://astrokestrel.vercel.app)  
+> GitHub: [github.com/JustAnn1234/AstroKestrel](https://github.com/JustAnn1234/AstroKestrel)
 
 ---
 
 ## The Problem
 
-NASA and SpaceX are actively planning the first crewed Mars mission. The journey takes 6 to 9 months each way. And the biggest threat to that mission isn't a rocket failure — it's what space quietly does to the human body.
+SpaceX is actively planning the first human missions to Mars, with crewed flights projected as early as 2031–2033. No human has ever traveled to Mars — every mission has been robotic. The journey takes 7 to 9 months each way. During that time, the human body undergoes progressive physiological deterioration across multiple interconnected systems simultaneously.
 
-Bone density loss. Cardiovascular deconditioning. Immune dysregulation. Vision damage from rising intracranial pressure (SANS). These systems don't fail independently — they **cascade**. And NASA's current tools monitor each system in isolation, reacting to symptoms rather than predicting them.
+**What space does to the human body:**
+- **Cardiovascular deconditioning** — the heart weakens without gravity to push against
+- **Immune dysregulation** — latent viruses reactivate, cytokine cascades develop
+- **Metabolic disruption** — electrolyte imbalances, insulin resistance, kidney stress
+- **SANS (Spaceflight Associated Neuro-Ocular Syndrome)** — rising intracranial pressure physically flattens the eyeball, causing vision loss
+- **Radiation/oxidative stress** — cosmic rays damage DNA, trigger chronic inflammation
 
-**AstroKestrel sees what's coming before the first symptom appears.**
+These systems do not fail independently. **They cascade.** And with communication delays of 4 to 40 minutes making real-time Earth-based medical support infeasible, the crew must rely on onboard intelligence.
 
-Just as the kestrel is the only bird that can hold perfectly still in a storm while watching everything below it with extraordinary precision — AstroKestrel holds steady, watches all four body systems simultaneously, and acts before the crisis arrives.
+**The critical gap:** existing space health monitoring tools are reactive (respond to symptoms after they appear) and siloed (monitor one system at a time). No operational tool currently detects cross-system physiological coupling before the clinical threshold is crossed.
+
+AstroKestrel addresses this gap.
 
 ---
 
-## The Solution
+## What AstroKestrel Does
 
-AstroKestrel is a cross-system predictive health intelligence platform that:
+AstroKestrel is a crew health surveillance and clinical decision-support system that:
 
-- Ingests real astronaut biomarker data from NASA's Open Science Data Repository (Inspiration4 mission)
+- Ingests real astronaut biomarker data from NASA's Open Science Data Repository (Inspiration4 mission, OSD-575 and OSD-530)
 - Builds a personalised pre-flight baseline for each crew member
-- Detects anomalies across **4 body systems** simultaneously: cardiovascular, immune, metabolic, and neuro-ocular (SANS)
-- Flags dangerous **cross-system interactions** — e.g. when cardiovascular AND immune systems deteriorate together, the combined risk is exponentially worse than either alone
-- Forecasts deterioration trajectories across a simulated **180-500 day Mars mission**
-- Delivers **actionable intervention recommendations** to mission commanders before symptoms appear
-- Features a dual-mode interface: **Modern Dashboard** and **NASA Flight Display** mode
-- Includes **Ask AstroKestrel** — a live AI mission briefing assistant powered by real biomarker data
+- Detects early physiological drift and cross-system coupling across **five monitored domains simultaneously**
+- Applies a **dual-engine risk scoring system** — both probabilistic ML and deterministic clinical rules
+- Forecasts deterioration trajectories for simulated missions up to 500 days
+- Delivers actionable, tiered intervention recommendations to mission commanders
+- Screens all AI-generated briefings through **IBM Granite Guardian** before they reach the user
+
+**AstroKestrel supports the Crew Medical Officer's decision-making. It does not replace it. Human authority is always final.**
 
 ---
 
-## What Makes It Different
+## Five Monitored Systems
 
-Every existing space health tool is either:
-- **Reactive** — responds to symptoms you report
-- **Siloed** — monitors one system at a time
-
-AstroKestrel is the first integrated, cross-system, **predictive** health intelligence system built for space medicine.
-
-When cardiovascular AND immune markers deteriorate together, the risk isn't additive — it's multiplicative. AstroKestrel's interaction penalty engine catches that cascade. No current operational tool does.
-
----
-
-## Real Data. Real Findings.
-
-Built on NASA OSDR datasets from the **Inspiration4 mission** (OSD-575, OSD-530):
-- Comprehensive Metabolic Panel — 28 samples, 4 astronauts, 7 timepoints
-- Cardiovascular serum biomarkers (CRP, fibrinogen, haptoglobin)
-- 143-cytokine immune panel (IL-6, TNF-α, IL-1β, IFN-γ, VEGF-A)
-- RNA sequencing data — 22,475 genes, 20 SANS-relevant gene signatures identified
-
-### Key findings from real data:
-
-**Astronaut C001** — cardiovascular system deteriorates progressively post-return, reaching CRITICAL risk by Day 82. Immune system peaks simultaneously — a cross-system cascade that AstroKestrel flags before individual system thresholds would trigger any alert.
-
-**Mars mission projection** — C001's cardiovascular system breaches CRITICAL threshold by Mission Day 80, with immune cascade beginning at Day 60, and neuro-ocular (SANS) risk reaching critical by Day 150. AstroKestrel recommends intervention by Day 46 — two weeks before the first crisis.
-
-**Astronaut C003** — immediate CRITICAL immune response on return Day 1, with neuro-ocular risk remaining persistently elevated across all timepoints. Highest SANS risk profile in the crew.
+| System | Data Source | Method |
+|--------|-------------|--------|
+| Cardiovascular | OSD-575 serum panel | Z-score deviation + deterministic CRP/fibrinogen thresholds |
+| Immune / Cytokine | OSD-575 multiplex panel | 143-cytokine deviation + IL-6/TNF-α/IL-1β clinical thresholds |
+| Metabolic | OSD-575 CMP panel | Electrolyte, renal, hepatic marker deviation |
+| Neuro-Ocular (SANS) | OSD-530 RNA-seq | 20 SANS-relevant genes identified; physiologically-grounded model |
+| Radiation / Oxidative Stress | OSD-575 immune proxies | MCP-1, IL-8, VEGF-A as indirect radiation biomarker surrogates |
 
 ---
 
-## AI Approach & Architecture
+## The Novel Technical Approach
+
+### Dual-Engine Risk Scoring
+
+Every biomarker reading passes through two independent engines:
+
+- **Engine 1 — ML Anomaly Detection:** Z-score deviation from each astronaut's personal pre-flight baseline, normalised to a 0–1 risk scale using a sigmoid function. Personalised — not generic population norms.
+- **Engine 2 — Deterministic Clinical Rules:** Fires independently when biomarkers breach established clinical thresholds (e.g. CRP >10 mg/L, TNF-α >50 pg/mL). Cannot be overridden by ML uncertainty. Provides a hard safety net.
+
+The combined tier is always the higher of the two engines.
+
+### Cross-System Cascade Detection
+
+When multiple systems deteriorate simultaneously, risk is not additive — it is multiplicative:
+
+| Cascade | Penalty |
+|---------|---------|
+| Cardiovascular + Immune | 1.4× |
+| SANS + Cardiovascular | 1.35× |
+| Radiation + Immune | 1.25× |
+| Triple system cascade | 1.7–1.8× |
+
+### Four-Tier Alert System
+
+**WATCH** → **REVIEW** → **MEDICAL ADVISORY** → **IMMEDIATE INTERVENTION**
+
+Each tier has defined commander actions, escalation windows, and traceability logging.
+
+---
+
+## Real Data. Scientifically Grounded Findings.
+
+Built on NASA OSDR datasets from **Inspiration4** (September 2021) — the first all-civilian orbital spaceflight. Four crew members. Blood samples at pre-flight (L-92, L-44, L-3) and post-return (R+1, R+45, R+82, R+194) timepoints.
+
+**Key findings from real data:**
+- **Astronaut C001:** CRP at 15.4 mg/L equivalent (normal <3 mg/L) and TNF-α at 69 pg/mL (normal <8.1 pg/mL) at Day 194 post-return. AstroKestrel detects a cardiovascular-immune cascade — IMMEDIATE INTERVENTION tier.
+- **Astronaut C003:** Highest radiation proxy risk (0.905) and VEGF-A at 1,281 pg/mL — consistent with the cephalad fluid shift mechanism implicated in SANS development.
+- **Mars projection:** On a simulated 180-day mission, C001's cardiovascular system reaches critical threshold by Mission Day 80, with immune cascade beginning at Day 60. AstroKestrel recommends intervention by Day 46 — over a month before the first projected symptom.
+
+All risk scores carry **±10% estimated uncertainty** — explicitly disclosed on every output.
+
+---
+
+## Real-World Implementation Pathway
+
+### How AstroKestrel Integrates With Actual Space Mission Health Systems
+
+Current space missions already collect the data AstroKestrel needs:
+
+- **Wearable biometric sensors** track heart rate, blood oxygen, skin temperature, respiration, sleep cycles, and cognitive fatigue patterns continuously. NASA's Artemis II crew is currently monitored using wearable technology throughout their mission.
+- **Periodic biological sampling** — blood, urine, and saliva — is standard protocol on ISS missions and planned for Artemis/Mars missions. These samples generate exactly the biomarker panels (CMP, cytokine multiplex, cardiovascular serum) that power AstroKestrel's analysis.
+- **Active radiation dosimeters** measure cumulative cosmic ray and solar particle exposure in real time — data that would feed directly into AstroKestrel's radiation module.
+
+**Three deployment pathways for AstroKestrel:**
+
+- **Pathway 1 — NASA Human Research Programme:** AstroKestrel's cross-system risk engine and Mars mission forecasting could serve as a prototype decision-support layer on top of NASA HRP's CIPHER experiment data. The platform already exports the biomarker formats AstroKestrel ingests.
+- **Pathway 2 — Axiom Space / SpaceX Civilian Missions:** Axiom Space runs private astronaut missions to the ISS with crews who lack years of medical preparation. AstroKestrel's CMO-support model — monitoring civilian physiological responses, generating plain-language intervention recommendations — directly addresses the medical risk gap in civilian spaceflight.
+- **Pathway 3 — Deep Space Medical Officer Training:** AstroKestrel's simulation mode (drag a slider from Day 1 to Day 500) provides a training environment for flight surgeons to build intuition about multi-system deterioration cascades before managing real crew members on long-duration missions.
+
+### Integration Requirements for Production Deployment
+
+- **Real-time wearable data stream** → replace periodic sample readings with continuous telemetry
+- **On-board edge compute** → deploy ML models locally on spacecraft hardware (already offline-capable)
+- **Electronic Health Record integration** → log all alerts, acknowledgements, and interventions to mission medical record
+- **Federated learning** → train improved models across multiple missions without centralising private medical data (IBM watsonx.data architecture)
+
+---
+
+## IBM Tool Usage
+
+| Tool | Role |
+|------|------|
+| **IBM Bob** | Primary development partner — architecture, debugging, code refinement, documentation throughout the entire build |
+| **IBM Granite 3.3 8B** | Clinical briefing assistant — generates plain-language mission commander summaries from real biomarker data |
+| **IBM Granite Guardian 3.3** | Safety screening — screens every AI response against three medical criteria: no drug prescriptions, no definitive diagnoses, no actions requiring physician authorisation |
+
+---
+
+## Technical Limitations & Scientific Disclosure
+
+| Limitation | Detail |
+|-----------|--------|
+| Dataset size | 4 astronauts, 3-day mission. ±10% estimated uncertainty on all risk scores |
+| Mars forecast | Polynomial extrapolation beyond observed data range — indicative trajectory, not validated prediction |
+| SANS module | RNA-seq gene proxy model — not direct intracranial pressure measurement |
+| Radiation module | Immune proxy biomarkers only — not direct dosimetry |
+| Temporal resolution | Periodic sampling (not continuous streaming) — production deployment would use real-time wearable feeds |
+| Offline AI | ML and deterministic engines run fully offline. AI chat requires internet connection |
+
+---
+
+## What Would Be Added With More Time
+
+- **Musculoskeletal module** — bone density and muscle cross-section tracking from DXA scan data
+- **Cognitive performance module** — reaction time, memory, and decision speed tests integrated as a 7th system
+- **Real-time telemetry integration** — replace periodic sample readings with continuous wearable data streams
+- **Direct radiation dosimetry** — replace proxy markers with actual cumulative dose measurements from active dosimeters
+- **Federated learning** — train improved models across multiple missions without centralising private health data
+- **Validated Mars trajectories** — retrain forecast models on ISS 6-month mission datasets for scientifically validated long-duration projections
+- **Electronic Health Record export** — structured FHIR-format export of all alerts and interventions for mission medical record
+
+---
+
+## Architecture
 
 ```text
 NASA OSDR Data (OSD-575 + OSD-530)
-       │
-       ▼
-Data Loader (ml/data_loader.py)
+         │
+         ▼
+Data Loader
    • Parses astronaut IDs, mission timepoints
    • Pre-flight baseline vs post-return phases
-       │
-       ▼
-Anomaly Detection (ml/anomaly.py)
-   • Z-score deviation from personal pre-flight baseline
-   • Sigmoid normalisation → 0–1 risk scale
-   • Per-system scores: cardiovascular, immune, metabolic
-       │
-       ▼
-SANS Module (ml/sans.py)
-   • 20 SANS-relevant genes identified in RNA-seq data
-   • Neuro-ocular risk scoring: 4th body system
-       │
-       ▼
-Cross-System Risk Engine (ml/risk_engine.py)  <-- THE NOVEL LAYER
-   • Weighted composite scoring across all 4 systems
-   • Interaction penalty rules:
-       - Cardiovascular + Immune → 1.4x penalty
-       - SANS + Cardiovascular → 1.35x penalty
-       - Triple cascade → 1.8x penalty
-   • Actionable intervention generation
-       │
-       ▼
-Mars Mission Forecasting (ml/forecast.py)
-   • Polynomial trajectory fitting on post-return data
-   • 180–500 day extrapolation
-   • Critical threshold day prediction
-   • Intervention timing recommendations
-       │
-       ▼
-FastAPI Backend (api/main.py)
-   • 6 endpoints: dashboard, timeline, forecast, brief, alerts, chat
-       │
-       ▼
-React Dashboard (astrokestrel-frontend/)
+         │
+         ▼
+┌─────────────────────────────────────────┐
+│  DUAL-ENGINE RISK LAYER                 │
+│  ML Anomaly Detection (anomaly.py)      │
+│  + Deterministic Rules (deterministic_  │
+│    rules.py) — fires on absolute        │
+│    clinical thresholds independently    │
+│  Combined tier = higher of both         │
+└─────────────────────────────────────────┘
+         │
+         ▼
+Cross-System Risk Engine (risk_engine.py)
+   • 5-system weighted scoring + interaction penalty rules (1.25× to 1.8×)
+         │
+         ▼
+Mars Mission Forecasting (forecast.py)
+   • Polynomial trajectory fitting
+   • Up to 500-day extrapolation
+         │
+         ▼
+FastAPI Backend — 7 endpoints
+         │
+         ▼
+React 19 Dashboard
    • Dual-mode: Modern + NASA Flight Display
-   • Floating AI chat assistant (Ask AstroKestrel)
-   • Mission simulation slider (Day 1–500)
-   • 4-system radar chart
-   • Real-time risk timeline
+   • IBM Granite 3.3 8B clinical briefing
+   • IBM Granite Guardian safety screening
+
 ```
-
-## How IBM Bob Was Used
-
-IBM Bob was used as the primary development partner throughout the build:
-- Architecture planning and API endpoint design
-- Debugging the anomaly scoring normalisation pipeline
-- Optimising the cross-system interaction penalty logic
-- React component structure, state management, and dual-mode theming
-- Data pipeline troubleshooting across multiple NASA dataset formats
-- README and documentation drafting
-
----
-
-## Challenge Theme Alignment
-
-**August Challenge: Advance Space Exploration with AI**
-
-AstroKestrel directly addresses NASA's documented gap in integrated, predictive space health monitoring. It transforms space medicine from reactive symptom management to insight-driven risk intelligence — enabling smarter missions and making deep space exploration safer for human crews.
-
-> *"In mythology, Argus had a hundred eyes and could never be surprised. AstroKestrel watches four body systems simultaneously and acts before the crisis arrives."*
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Data | NASA OSDR (OSD-575, OSD-530) |
-| ML | Python, scikit-learn, NumPy, pandas |
-| AI Chat | Groq API (Llama 3.3 70B) |
-| API | FastAPI, Uvicorn |
-| Frontend | React 19, Vite, Recharts, Lucide |
 
 ---
 
 ## Setup & Run
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Groq API key (free at console.groq.com)
-
-### Backend
 ```bash
+# Clone
+git clone [https://github.com/JustAnn1234/AstroKestrel](https://github.com/JustAnn1234/AstroKestrel)
+cd AstroKestrel
+
+# Backend
 python -m venv venv
-venv\Scripts\activate          # Windows
+venv\Scripts\activate
 pip install -r requirements.txt
 
-# Create .env file with your Groq key
-echo GROQ_API_KEY=your_key_here > .env
+# Create .env file
+echo GROQ_API_KEY=your_key > .env
+echo HF_TOKEN=your_huggingface_token >> .env
 
 uvicorn api.main:app --reload --port 8000
-```
 
-### Frontend
-```bash
+# Frontend (new terminal)
 cd astrokestrel-frontend
 npm install
 npm run dev
+
 ```
 
 Open `http://localhost:5173`
 
 ---
 
-## Project Structure
-
-```text
-AstroKestrel/
-├── api/
-│   └── main.py                    # FastAPI backend, 6 endpoints
-├── ml/
-│   ├── data_loader.py             # NASA OSDR data ingestion
-│   ├── anomaly.py                 # Z-score deviation risk scoring
-│   ├── risk_engine.py             # Cross-system cascade detection
-│   ├── forecast.py                # Mars mission trajectory forecasting
-│   └── sans.py                    # Neuro-ocular SANS risk module
-├── data/
-│   └── Raw/                       # NASA OSDR datasets
-├── astrokestrel-frontend/
-│   └── src/
-│       └── App.jsx                # React dashboard, dual-mode UI
-├── requirements.txt
-└── README.md
-```
-
 ## NASA Datasets Used
 
 | Dataset | File | Content |
-|---------|------|---------|
+| --- | --- | --- |
 | OSD-575 | CMP_TRANSFORMED.csv | Comprehensive metabolic panel |
 | OSD-575 | cardiovascular_EvePanel.csv | Cardiovascular serum biomarkers |
 | OSD-575 | immune_EvePanel.csv | 143-cytokine immune panel |
@@ -211,27 +243,30 @@ AstroKestrel/
 
 ---
 
-## Future Development
+## Challenge Theme Alignment
 
-- Integration of ISS long-duration mission datasets (6-month timepoints)
-- Direct intracranial pressure measurement data for SANS validation
-- Cognitive performance module (reaction time, memory, decision speed)
-- Musculoskeletal deterioration tracking (bone density, muscle cross-section)
-- Real-time telemetry integration via NASA's DTN protocol
-- Federated learning across multiple mission datasets
+**August 2026: Advance Space Exploration with AI**
+
+AstroKestrel transforms space medicine from reactive symptom management to proactive physiological surveillance — advancing mission safety for the first generation of humans who will travel beyond Earth's orbit to Mars.
 
 ---
 
-## About the Builder
+## About
 
-**Omosomi Ann Hassan** — AI/ML Engineer with a BSc in Physiology (University of Benin).
+**Omosomi Ann Hassan**
 
-The combination of biomedical science and AI engineering is what makes AstroKestrel possible. Understanding *why* each body system fails in space — the homeostatic mechanisms, the feedback loops, the cross-system interactions — is what separates a model that monitors numbers from one that understands what those numbers mean for human survival.
+AI/ML Engineer | BSc Physiology, University of Benin
 
-*Built during the IBM AI Builders Challenge, August 2026.*
+AGIT Africa Agility Programme | IBM AI Builders Challenge 2026
+
+The combination of biomedical science and AI engineering is what makes AstroKestrel possible. Understanding *why* each body system fails in space — the homeostatic mechanisms, the feedback loops, the cross-system interactions — is what separates a monitoring dashboard from a system that understands what the numbers mean for human survival.
 
 ---
 
 ## License
 
-MIT License — open for the space medicine community to build on.
+MIT — open for the space medicine community to build on.
+
+```
+
+```
