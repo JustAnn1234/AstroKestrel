@@ -51,6 +51,50 @@ AstroKestrel is a crew health surveillance and clinical decision-support system 
 
 ---
 
+## Dashboard Features
+
+### Crew Status Panel
+Click any crew card to load that astronaut's full mission intelligence on the right side of the dashboard — without leaving the page. Each card shows all five system risk bars, the composite risk score, and an uncertainty disclosure. If a commander has previously acknowledged alerts for that astronaut, the card shows an **"acked"** badge (suppressed for 4 hours) — providing visual confirmation that the alert has been seen and logged.
+
+### Mission Elapsed Time (MET) Clock
+The navigation bar shows a live Mission Elapsed Time clock — a small but deliberate design choice. On a real mission, every second counts. The clock runs from the moment the session starts.
+
+### Mars Mission Simulation Slider
+On the main dashboard, selecting any astronaut reveals a **drag slider from Day 1 to Day 500**. Drag it and watch the projected risk scores update in real time for each body system. The slider interpolates risk between three forecast checkpoints (Day 30, Day 90, Day 180) and shows a warning badge the moment the slider crosses the day that system is projected to breach the critical threshold. This is what "AstroKestrel flags it at Day 46" means in practice — the Cardiovascular bar turns red and shows `⚠ CRIT DAY 80` the moment you drag past that point.
+
+### Mars Mission Trajectory Cards (on Individual Astronaut Page)
+On each astronaut's full report, the **Mars Mission Trajectory (180-day simulation)** section shows five cards — one per body system. Each card contains three numbers:
+- **D30** — projected risk at Mission Day 30 (one month in)
+- **D90** — projected risk at Mission Day 90 (three months in)
+- **D180** — projected risk at Mission Day 180 (six months in — roughly the Mars transit duration)
+
+If a system is projected to breach the critical threshold (75% risk) at any point, a red **⚠ D[number]** badge appears on that card. For C001's Cardiovascular card, you'll see **⚠ D80** — meaning that system is projected critical by Day 80. The colours go from green → yellow → orange → red as risk increases. These are not clickable — they are a read-only forecast summary. The interactive version is the slider on the main dashboard.
+
+### Comparative Crew Radar Chart
+The dashboard includes a **radar chart** that overlays all four crew members on a single spider diagram — one axis per body system. This lets a mission commander see at a glance which crew member is most exposed in which domain, and whether the crew as a whole has a shared vulnerability (e.g. all four showing elevated radiation proxy).
+
+### Biomarker Evidence Chain (Explainability Layer)
+Below the main dashboard, a collapsible **Biomarker Evidence Chain** panel shows the raw data behind the risk scores — the actual blood values, the pre-flight baseline mean, and the statistical deviation (z-score). Biomarkers that triggered a deterministic clinical rule are highlighted in colour with the significance explained in plain language. This is the full audit trail: not just *what* the risk score is, but *exactly which blood test value caused it and by how much it exceeded the normal range*.
+
+### Clinical Rules Acknowledgement & Traceability Log
+On each astronaut's individual report page, every clinical rule that has fired appears as a card with an **Acknowledge** button. When a mission commander clicks Acknowledge:
+- The rule is marked as reviewed (green tick)
+- A timestamped entry is added to the **Commander Action Log** at the bottom of the page
+- The log entry records the time, the astronaut ID, the rule name, and "MISSION COMMANDER" as the acknowledging authority
+- The log **persists across navigation** — stored in the browser so it survives page refreshes
+
+This exists because in any regulated medical or mission context, it is not enough to *see* an alert — you must be able to prove it was seen, reviewed, and actioned. AstroKestrel makes that traceability automatic.
+
+### Floating AI Chat Assistant
+The **🦅 button** in the bottom-right corner of the screen bounces gently to invite interaction. Click it to open the AI clinical briefing assistant, which has full awareness of the current crew dashboard data. The panel is **draggable** — grab the header and move it anywhere on screen so it doesn't cover the data you're reading. The assistant is powered by IBM Granite 3.3 8B and every response is screened by IBM Granite Guardian before it appears.
+
+### Dual Display Modes
+The entire interface can be toggled between:
+- **Modern mode** — clean card-based dashboard with gradients and rounded corners
+- **Flight Display mode** — monospace terminal aesthetic with green-on-black styling, block characters for risk bars, and ALL-CAPS labelling — mimicking actual mission control console aesthetics
+
+---
+
 ## Five Monitored Systems
 
 | System | Data Source | Method |
