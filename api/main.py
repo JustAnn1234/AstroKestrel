@@ -7,6 +7,7 @@ import httpx
 import pandas as pd
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from pathlib import Path
 
 from ml.data_loader import load_all
 from ml.anomaly import run_anomaly_analysis
@@ -25,7 +26,13 @@ from ml.deterministic_rules import (
     ALERT_TIERS
 )
 
-load_dotenv()
+# Load .env from project root regardless of where uvicorn is started from
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+# Debug: confirm keys loaded
+print(f"GROQ key loaded: {'yes' if os.getenv('GROQ_API_KEY') else 'NO — CHECK .env'}")
+print(f"HF token loaded: {'yes' if os.getenv('HF_TOKEN') else 'NO — CHECK .env'}")
 
 app = FastAPI(title="AstroKestrel API", version="2.0.0")
 
@@ -418,13 +425,33 @@ async def chat(payload: ChatQuery):
     hf_token = os.getenv("HF_TOKEN", "")
     groq_key = os.getenv("GROQ_API_KEY", "")
 
-    system_prompt = f"""You are AstroKestrel's Clinical Briefing Assistant — a decision-support
-tool for crew health surveillance on long-duration space missions.
+    print(f"[chat] HF_TOKEN present: {bool(hf_token)} | GROQ_API_KEY present: {bool(groq_key)}")
 
-You have access to real NASA Inspiration4 astronaut biomarker data processed through
-AstroKestrel's ML anomaly detection and deterministic clinical rules engine.
+    # Build a compact structured summary of ALL crew so no astronaut gets cut off
+    context_summary = ""
+    try:
+        import json
+        dashboard = json.loads(payload.context) if payload.context else {}
+        crew = dashboard.get("crew", [])
+        lines = []
+        for a in crew:
+            scores = ", ".join(f"{k}={v:.2f}" for k, v in (a.get("system_scores") or {}).items())
+            lines.append(
+                f"{a['id']}: composite={a.get('composite_risk', 0):.2f} "
+                f"tier={a.get('combined_tier', '?')} alert={a.get('alert_level', '?')} "
+                f"day={a.get('latest_day', '?')} uncertainty=±{a.get('uncertainty_pct', '?')}% "
+                f"systems=[{scores}]"
+            )
+        context_summary = "\n".join(lines) if lines else "(no crew data)"
+    except Exception:
+        context_summary = payload.context[:600] if payload.context else "(no data)"
 
-Current mission data: {payload.context}
+    system_prompt = f"""You are AstroKestrel's Clinical Briefing Assistant — a decision-support tool for crew health surveillance on long-duration space missions.
+
+You have access to real NASA Inspiration4 astronaut biomarker data processed through AstroKestrel's ML anomaly detection and deterministic clinical rules engine.
+
+Current crew status:
+{context_summary}
 
 OPERATIONAL CONSTRAINTS:
 - You support the Crew Medical Officer's decision-making. You do not replace it.
@@ -432,24 +459,66 @@ OPERATIONAL CONSTRAINTS:
 - Never make definitive medical diagnoses.
 - Always recommend CMO review for MEDICAL_ADVISORY or IMMEDIATE_INTERVENTION findings.
 - Frame outputs as risk assessments requiring human clinical judgment.
-- Use specific biomarker numbers from the data when available.
-- Keep responses under 180 words.
-- Use operational language: "elevated risk", "warrants review", "trend suggests".
+- Keep responses under 150 words.
+- Use operational language: elevated risk, warrants review, trend suggests.
+- Write in plain conversational prose. No markdown, no bullet points, no bold, no headers.
 You are speaking to a mission commander or flight surgeon. Be direct and factual."""
 
-    # ── Primary: IBM Granite 3.3 8B via HuggingFace ───────────────
+    # ── Primary: Groq compound ─────────────────────────────────────
+    # Note: HuggingFace inference API is blocked on many networks (DNS failure).
+    # Groq compound is the reliable path with this key tier.
+    if groq_key:
+        try:
+            print(f"[chat] Trying Groq compound ({groq_key[:8]}...)...")
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {groq_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": "groq/compound",
+                        "max_tokens": 400,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": payload.query}
+                        ]
+                    },
+                    timeout=30.0
+                )
+                print(f"[chat] Groq status: {response.status_code}")
+                data = response.json()
+                if "choices" in data:
+                    reply = data["choices"][0]["message"]["content"]
+                    print(f"[chat] Groq success")
+                    return {
+                        "reply": reply,
+                        "engine": "Groq Compound",
+                        "guardian_screened": False,
+                        "disclaimer": "Clinical briefing only. Does not replace CMO judgment."
+                    }
+                else:
+                    print(f"[chat] Groq unexpected response: {str(data)[:300]}")
+        except Exception as e:
+            print(f"[chat] Groq exception: {type(e).__name__}: {e}")
+
+    # ── Fallback: HuggingFace Granite (requires network access to api-inference.huggingface.co) ──
     if hf_token:
         try:
             prompt = f"<|system|>\n{system_prompt}\n<|user|>\n{payload.query}\n<|assistant|>\n"
-
+            print(f"[chat] Trying HF Granite (prompt length: {len(prompt)} chars)...")
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     "https://api-inference.huggingface.co/models/ibm-granite/granite-3.3-8b-instruct",
-                    headers={"Authorization": f"Bearer {hf_token}", "Content-Type": "application/json"},
+                    headers={
+                        "Authorization": f"Bearer {hf_token}",
+                        "Content-Type": "application/json"
+                    },
                     json={
                         "inputs": prompt,
                         "parameters": {
-                            "max_new_tokens": 400,
+                            "max_new_tokens": 300,
                             "temperature": 0.3,
                             "return_full_text": False
                         }
@@ -457,73 +526,35 @@ You are speaking to a mission commander or flight surgeon. Be direct and factual
                     timeout=30.0
                 )
                 output = response.json()
+                print(f"[chat] HF status: {response.status_code} | response: {str(output)[:300]}")
 
-                if isinstance(output, list) and output:
-                    reply = output[0].get("generated_text", "").strip()
+                if isinstance(output, list) and output and "generated_text" in output[0]:
+                    reply = output[0]["generated_text"].strip()
+                    if reply:
+                        guardian = await screen_with_guardian(reply, hf_token)
+                        if not guardian["safe"]:
+                            reply = (
+                                "This query requires direct CMO evaluation. "
+                                "AstroKestrel's safety screening recommends "
+                                "immediate Crew Medical Officer review."
+                            )
+                        print(f"[chat] HF success — guardian screened: {guardian['screened']}")
+                        return {
+                            "reply": reply,
+                            "engine": "IBM Granite 3.3 8B (HuggingFace)",
+                            "guardian_screened": guardian["screened"],
+                            "guardian_safe": guardian["safe"],
+                            "disclaimer": "Clinical briefing only. Screened by IBM Granite Guardian."
+                        }
                 elif isinstance(output, dict) and "error" in output:
-                    raise ValueError(output["error"])
-                else:
-                    raise ValueError("Unexpected HuggingFace response format")
-
-                if not reply:
-                    raise ValueError("Empty response from Granite")
-
-                # ── Granite Guardian screening ─────────────────────
-                guardian = await screen_with_guardian(reply, hf_token)
-
-                if not guardian["safe"]:
-                    reply = (
-                        "This query requires direct CMO evaluation. "
-                        "AstroKestrel's safety screening has flagged this response "
-                        "as requiring qualified medical personnel review. "
-                        "Please consult the Crew Medical Officer directly."
-                    )
-
-                return {
-                    "reply": reply,
-                    "engine": "IBM Granite 3.3 8B (HuggingFace)",
-                    "guardian_screened": guardian["screened"],
-                    "guardian_safe": guardian["safe"],
-                    "disclaimer": (
-                        "Clinical briefing only. Does not replace CMO judgment. "
-                        "Screened by IBM Granite Guardian 3.3."
-                    )
-                }
-
+                    print(f"[chat] HF API error: {output['error']}")
         except Exception as e:
-            print(f"IBM Granite (HF) error: {e} — falling back to Groq")
+            print(f"[chat] HF exception: {type(e).__name__}: {e}")
 
-    # ── Fallback: Groq / Llama ─────────────────────────────────────
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {groq_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "llama-3.3-70b-versatile",
-                    "max_tokens": 500,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": payload.query}
-                    ]
-                },
-                timeout=30.0
-            )
-            data = response.json()
-            reply = data["choices"][0]["message"]["content"]
-            return {
-                "reply": reply,
-                "engine": "Llama 3.3 70B via Groq (fallback)",
-                "guardian_screened": False,
-                "disclaimer": "Clinical briefing only. Does not replace CMO judgment."
-            }
-    except Exception as e:
-        return {
-            "reply": "Communication error. Please retry.",
-            "engine": "unavailable",
-            "guardian_screened": False,
-            "disclaimer": ""
-        }
+    print("[chat] Both engines failed — returning error to client")
+    return {
+        "reply": "Communication error. Both IBM Granite and fallback unavailable. Check API keys in .env file.",
+        "engine": "unavailable",
+        "guardian_screened": False,
+        "disclaimer": ""
+    }

@@ -13,6 +13,7 @@ const SYSTEM_COLORS = {
   immune: "#f97316",
   metabolic: "#eab308",
   neuro_ocular: "#8b5cf6",
+  radiation: "#06b6d4",
 }
 
 const TIER_COLORS = {
@@ -280,7 +281,7 @@ export default function AstronautPage({ flight, setFlight }) {
         {/* ROW 2: Mars Forecast FULL WIDTH — 4 columns, one per system */}
         <div style={card}>
           <div style={cardTitle}>{flight ? "MARS MISSION TRAJECTORY — 180D SIMULATION" : "Mars Mission Trajectory (180-day simulation)"}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.75rem" }}>
             {forecast?.mars_mission_forecast?.map(sys => {
               const sysColor = SYSTEM_COLORS[sys.system] || "#64748b"
               return (

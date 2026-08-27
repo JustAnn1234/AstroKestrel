@@ -8,7 +8,15 @@ import {
 import { Routes, Route, useNavigate } from "react-router-dom"
 import AstronautPage from "./AstronautPage.jsx"
 
-const API = "http://localhost:8000"
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000"
+
+const SYSTEM_COLORS = {
+  cardiovascular: "#ef4444",
+  immune: "#f97316",
+  metabolic: "#eab308",
+  neuro_ocular: "#8b5cf6",
+  radiation: "#06b6d4"
+}
 
 const RISK_COLORS = {
   CRITICAL: "#ef4444",
@@ -118,6 +126,19 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
   const navigate = useNavigate()
   const color = RISK_COLORS[astronaut.alert_level] || "#64748b"
 
+  // Check if this alert was recently acknowledged (suppression logic)
+  const logKey = `astrokestrel_log_${astronaut.id}`
+  const isSuppressed = (() => {
+    try {
+      const log = JSON.parse(localStorage.getItem(logKey) || "[]")
+      const cutoff = Date.now() - (4 * 60 * 60 * 1000) // 4 hours
+      return log.some(entry =>
+        new Date(entry.timestamp).getTime() > cutoff &&
+        entry.action?.includes(astronaut.combined_tier || astronaut.alert_level)
+      )
+    } catch { return false }
+  })()
+
   if (flight) {
     return (
       <div onClick={onClick} style={{ background: selected ? "#001a0a" : "#000d0d", border: `1px solid ${selected ? "#00ff88" : "#00ff8830"}`, borderRadius: "4px", padding: "1rem", cursor: "pointer", marginBottom: "8px" }}>
@@ -157,10 +178,15 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
             <div style={{ fontSize: "11px", color: "#475569" }}>Day {astronaut.latest_day} post-return</div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
           {selected && (
             <span style={{ fontSize: "10px", color: "#6366f1", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", padding: "2px 8px", borderRadius: "999px" }}>
               Viewing ↗
+            </span>
+          )}
+          {isSuppressed && (
+            <span style={{ fontSize: "9px", color: "#475569", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", padding: "2px 6px", borderRadius: "999px" }}>
+              acked
             </span>
           )}
           <RiskBadge level={astronaut.alert_level} />
@@ -170,6 +196,14 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
         <RiskBar key={sys} system={sys.replace("_", " ")} value={score} />
       ))}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div>
+          <span style={{ fontSize: "11px", color: "#475569" }}>Composite risk</span>
+          {astronaut.uncertainty_pct && (
+            <div style={{ fontSize: "9px", color: "#334155", marginTop: "2px" }}>
+              ±{astronaut.uncertainty_pct}% uncertainty
+            </div>
+          )}
+        </div>
         <span style={{ fontSize: "18px", fontWeight: 700, color, fontFamily: "'Space Mono', monospace" }}>{(astronaut.composite_risk * 100).toFixed(1)}%</span>
         <button
           onClick={(e) => { e.stopPropagation(); navigate(`/astronaut/${astronaut.id}`) }}
@@ -226,6 +260,7 @@ function RadarPanel({ crew, flight }) {
     { system: "Immune", ...Object.fromEntries(crew.map(a => [a.id, +((a.system_scores.immune || 0) * 100).toFixed(0)])) },
     { system: "Metabolic", ...Object.fromEntries(crew.map(a => [a.id, +((a.system_scores.metabolic || 0) * 100).toFixed(0)])) },
     { system: "Neuro-Ocular", ...Object.fromEntries(crew.map(a => [a.id, +((a.system_scores.neuro_ocular || 0) * 100).toFixed(0)])) },
+    { system: "Radiation", ...Object.fromEntries(crew.map(a => [a.id, +((a.system_scores.radiation || 0) * 100).toFixed(0)])) },
   ]
   const colors = flight ? ["#00ff88", "#ff8800", "#00aaff", "#ffff00"] : ["#6366f1", "#f97316", "#22c55e", "#eab308"]
   return (
@@ -490,10 +525,28 @@ function FloatingChat({ dashboardData, flight }) {
   const panelWidth = 360
   const panelHeight = 480
   const panelRight = Math.min(pos.right, window.innerWidth - panelWidth - 8)
-  const panelBottom = Math.min(pos.bottom + 70, window.innerHeight - panelHeight - 8)
+  const panelBottom = Math.min(pos.bottom, window.innerHeight - panelHeight - 8)
+
+  // The panel's left edge in screen coords (measured from left of viewport)
+  const panelLeftEdge = window.innerWidth - panelRight - panelWidth
+  // If panel is on the right half of the screen → put × to its left; otherwise → to its right
+  const panelOnRightHalf = panelLeftEdge > window.innerWidth / 2
+  const btnRight = panelOnRightHalf
+    ? panelRight + panelWidth + 12                   // left of panel
+    : Math.max(8, panelRight - 12 - 56)              // right of panel
+  const btnBottom = panelBottom + panelHeight / 2 - 28
 
   return (
     <>
+      <style>{`
+        @keyframes chatBop {
+          0%   { transform: translateY(0px) rotate(0deg); }
+          25%  { transform: translateY(-6px) rotate(-3deg); }
+          50%  { transform: translateY(-10px) rotate(0deg); }
+          75%  { transform: translateY(-6px) rotate(3deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
+        }
+      `}</style>
       {open && (
         <div style={{ position: "fixed", bottom: `${panelBottom}px`, right: `${panelRight}px`, width: `${panelWidth}px`, height: `${panelHeight}px`, background: bg, border: `1px solid ${border}`, borderRadius: flight ? "4px" : "16px", display: "flex", flexDirection: "column", zIndex: 1000, boxShadow: `0 8px 32px rgba(0,0,0,0.6)` }}>
           <div onMouseDown={startDrag} style={{ padding: "14px 16px", borderBottom: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: flight ? "#001a0a" : "rgba(99,102,241,0.08)", borderRadius: flight ? "4px 4px 0 0" : "16px 16px 0 0", cursor: "grab", userSelect: "none" }}>
@@ -501,13 +554,12 @@ function FloatingChat({ dashboardData, flight }) {
               <div style={{ fontSize: "13px", fontWeight: 600, color: accent, fontFamily: ff, letterSpacing: flight ? "0.1em" : 0 }}>{flight ? "MISSION AI — ASTROKESTREL" : "Ask AstroKestrel"}</div>
               <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#64748b", marginTop: "2px", fontFamily: ff }}>{flight ? "DRAG HEADER TO MOVE" : "Drag header to move"}</div>
             </div>
-            {/* × ONLY in header — no floating × button when open */}
             <button onClick={(e) => { e.stopPropagation(); setOpen(false) }} style={{ background: "transparent", border: "none", color: flight ? "#00aa55" : "#64748b", fontSize: "20px", cursor: "pointer", lineHeight: 1, padding: "0 4px" }}>×</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-                <div style={{ maxWidth: "85%", background: m.role === "user" ? (flight ? "rgba(0,255,136,0.1)" : "rgba(99,102,241,0.2)") : (flight ? "transparent" : "rgba(255,255,255,0.04)"), border: `1px solid ${m.role === "user" ? accent + "40" : border}`, borderRadius: flight ? "2px" : "10px", padding: "8px 12px", fontSize: "12px", color: flight ? (m.role === "user" ? "#00ff88" : "#00cc66") : "#e2e8f0", fontFamily: ff, lineHeight: "1.5", whiteSpace: "pre-wrap" }}>
+                <div style={{ maxWidth: "85%", background: m.role === "user" ? (flight ? "rgba(0,255,136,0.1)" : "rgba(99,102,241,0.2)") : (flight ? "transparent" : "rgba(255,255,255,0.04)"), border: `1px solid ${m.role === "user" ? accent + "40" : border}`, borderRadius: flight ? "2px" : "10px", padding: "8px 12px", fontSize: "12px", color: flight ? (m.role === "user" ? "#00ff88" : "#00cc66") : "#e2e8f0", fontFamily: ff, lineHeight: "1.5", whiteSpace: "pre-wrap", textAlign: "left" }}>
                   {flight && m.role === "assistant" && "> "}{m.content}
                 </div>
               </div>
@@ -524,12 +576,60 @@ function FloatingChat({ dashboardData, flight }) {
         </div>
       )}
 
-      {/* Floating button ONLY shown when chat is closed */}
+      {/* Floating × button — shown when open, auto-flips left/right depending on panel position */}
+      {open && (
+        <button
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            bottom: `${btnBottom}px`,
+            right: `${btnRight}px`,
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: flight ? "#001a0a" : "#1e1b4b",
+            border: `2px solid ${flight ? "#00ff8880" : "rgba(99,102,241,0.5)"}`,
+            color: flight ? accent : "white",
+            fontSize: "22px",
+            cursor: "pointer",
+            zIndex: 1002,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: `0 4px 16px rgba(0,0,0,0.5)`,
+            userSelect: "none",
+          }}
+        >
+          ×
+        </button>
+      )}
+
+      {/* Floating 🦅 button — shown when closed, bops to invite opening, draggable */}
       {!open && (
         <button
           onMouseDown={startDrag}
           onClick={() => setOpen(true)}
-          style={{ position: "fixed", bottom: `${pos.bottom}px`, right: `${pos.right}px`, width: "56px", height: "56px", borderRadius: "50%", background: flight ? "#001a0a" : accent, border: `2px solid ${accent}`, color: flight ? accent : "white", fontSize: "22px", cursor: dragging ? "grabbing" : "pointer", zIndex: 1001, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 4px 20px ${accent}40`, transition: dragging ? "none" : "all 0.2s", userSelect: "none" }}
+          style={{
+            position: "fixed",
+            bottom: `${pos.bottom}px`,
+            right: `${pos.right}px`,
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: flight ? "#001a0a" : accent,
+            border: `2px solid ${accent}`,
+            color: flight ? accent : "white",
+            fontSize: "22px",
+            cursor: dragging ? "grabbing" : "pointer",
+            zIndex: 1001,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: `0 4px 20px ${accent}40`,
+            transition: dragging ? "none" : "all 0.2s",
+            userSelect: "none",
+            animation: !dragging ? "chatBop 2.8s ease-in-out infinite" : "none",
+          }}
         >
           🦅
         </button>
@@ -614,7 +714,7 @@ function Dashboard({ flight, setFlight }) {
           {[
             { label: flight ? "CREW MONITORED" : "Crew Monitored", value: dashboard.total_astronauts, sub: flight ? "INSPIRATION4 MISSION" : "Inspiration4 mission" },
             { label: flight ? "ACTIVE ALERTS" : "Active Alerts", value: dashboard.critical_alerts, sub: flight ? "REQ. COMMANDER ATTENTION" : "requiring attention", danger: dashboard.critical_alerts > 0 },
-            { label: flight ? "SYS MONITORED" : "Systems Tracked", value: 4, sub: flight ? "CV · IMM · MET · NRO" : "cardiovascular · immune · metabolic · neuro-ocular" },
+            { label: flight ? "SYS MONITORED" : "Systems Tracked", value: 5, sub: flight ? "CV · IMM · MET · NRO · RAD" : "cardiovascular · immune · metabolic · neuro-ocular · radiation" },
             { label: flight ? "BIOMARKERS" : "Biomarkers", value: "168+", sub: flight ? "NASA OSDR DATASETS" : "NASA OSDR — Inspiration4" }
           ].map(({ label, value, sub, danger }) => (
             <div key={label} style={{ ...s.metricCard, border: `1px solid ${danger ? (flight ? "#ff000040" : "rgba(239,68,68,0.3)") : (flight ? "#00ff8820" : "rgba(99,102,241,0.15)")}` }}>
@@ -626,10 +726,21 @@ function Dashboard({ flight, setFlight }) {
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.5rem" }}>
-  <div style={{ fontSize: "10px", color: "#475569", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "6px", padding: "4px 10px" }}>
-    🔒 ML models run offline · AI chat requires connection
-  </div>
-</div>
+          <div style={{
+            fontSize: "10px",
+            color: flight ? "#00aa55" : "#475569",
+            background: flight ? "rgba(0,255,136,0.05)" : "rgba(34,197,94,0.05)",
+            border: `1px solid ${flight ? "#00ff8820" : "rgba(34,197,94,0.15)"}`,
+            borderRadius: flight ? "2px" : "6px",
+            padding: "4px 10px",
+            fontFamily: flight ? "monospace" : "inherit",
+            letterSpacing: flight ? "0.05em" : 0
+          }}>
+            {flight
+              ? "🔒 ML+DETERMINISTIC: OFFLINE-CAPABLE · CHAT: CLOUD-DEPENDENT"
+              : "🔒 ML models run offline · AI chat requires connection"}
+          </div>
+        </div>
 
         <div style={{ marginBottom: "0.75rem", fontSize: "11px", color: flight ? "#00aa55" : "#64748b", fontFamily: flight ? "monospace" : "inherit" }}>
           {flight
