@@ -5,7 +5,7 @@
 > **IBM AI Builders Challenge — August 2026**  
 > Theme: Advance Space Exploration with AI  
 > Built by: Omosomi Ann Hassan  
-> Live Demo: [astrokestrel.vercel.app](https://astrokestrel.vercel.app)  
+> Live Demo: [astro-kestrel.vercel.app](https://astro-kestrel.vercel.app/)
 > GitHub: [github.com/JustAnn1234/AstroKestrel](https://github.com/JustAnn1234/AstroKestrel)
 
 ---
