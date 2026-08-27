@@ -2,11 +2,17 @@
 
 ### Crew Health Surveillance & Clinical Decision Support for Deep Space Missions
 
-> **IBM AI Builders Challenge — August 2026**  
-> Theme: Advance Space Exploration with AI  
-> Built by: Omosomi Ann Hassan  
+> **IBM AI Builders Challenge — August 2026**
+> Theme: Advance Space Exploration with AI
+> Built by: Omosomi Ann Hassan
 > Live Demo: [astro-kestrel.vercel.app](https://astro-kestrel.vercel.app/)
 > GitHub: [github.com/JustAnn1234/AstroKestrel](https://github.com/JustAnn1234/AstroKestrel)
+
+---
+
+> *The kestrel is the only bird that can hold perfectly still in a storm — hovering motionless while watching everything below it with extraordinary precision. AstroKestrel holds steady, watches all five body systems simultaneously, and acts before the crisis arrives.*
+>
+> **AstroKestrel sees what's coming before the first symptom appears.**
 
 ---
 
