@@ -2,6 +2,19 @@ import pandas as pd
 import numpy as np
 import os
 
+from pathlib import Path
+import pandas as pd
+
+# Dynamic project root path resolution
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data" / "raw"
+
+def load_metabolic():
+    file_path = DATA_DIR / "LSDS-8_Comprehensive_Metabolic_Panel_CMP_TRANSFORMED.csv"
+    return pd.read_csv(file_path)
+
+# Ensure all dataset loaders in this file use DATA_DIR instead of relative string paths
+
 DATA_PATH = "data/raw/"
 
 def parse_timepoint(sample_name):
