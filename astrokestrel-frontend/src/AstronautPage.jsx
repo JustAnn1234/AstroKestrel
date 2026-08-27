@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, ReferenceLine
 } from "recharts"
 
-const API = "http://localhost:8000"
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
 const SYSTEM_COLORS = {
   cardiovascular: "#ef4444",
@@ -140,11 +140,20 @@ export default function AstronautPage({ flight, setFlight }) {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: ${accent}30; border-radius: 2px; }
         ${flight ? "* { text-shadow: 0 0 8px rgba(0,255,136,0.15); } body { background: #000a0a; }" : ""}
+        @media (max-width: 768px) {
+          .ak-header-grid { grid-template-columns: 1fr 1fr !important; }
+          .ak-two-col { grid-template-columns: 1fr !important; }
+          .ak-five-col { grid-template-columns: 1fr 1fr !important; }
+          .ak-rules-grid { grid-template-columns: 1fr !important; }
+          .ak-main { padding: 1rem !important; }
+          .ak-nav { padding: 0 1rem !important; }
+          .ak-nav-inner { flex-wrap: wrap; height: auto !important; padding: 8px 0 !important; gap: 8px !important; }
+        }
       `}</style>
 
       {/* NAV */}
-      <nav style={{ background: flight ? "#000d0d" : "rgba(13,18,35,0.95)", borderBottom: `1px solid ${border}`, padding: "0 2rem", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "56px" }}>
+      <nav className="ak-nav" style={{ background: flight ? "#000d0d" : "rgba(13,18,35,0.95)", borderBottom: `1px solid ${border}`, padding: "0 2rem", position: "sticky", top: 0, zIndex: 100 }}>
+        <div className="ak-nav-inner" style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => navigate("/")} style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: flight ? "2px" : "8px", padding: "6px 12px", color: muted, fontSize: "12px", cursor: "pointer", fontFamily: ff }}>
               {flight ? "← DASHBOARD" : "← Dashboard"}
@@ -170,11 +179,11 @@ export default function AstronautPage({ flight, setFlight }) {
         </div>
       </nav>
 
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "1.5rem 2rem" }}>
+      <main className="ak-main" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1.5rem 2rem" }}>
 
         {/* HEADER SUMMARY CARD */}
         <div style={{ ...card, borderColor: `${tierColor}30`, marginBottom: "1.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "1rem", marginBottom: brief.commander_action ? "14px" : 0 }}>
+          <div className="ak-header-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "1rem", marginBottom: brief.commander_action ? "14px" : 0 }}>
             <div>
               <div style={{ fontSize: "10px", color: muted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Composite Risk</div>
               <div style={{ fontSize: "32px", fontWeight: 700, color: tierColor, fontFamily: "'Space Mono', monospace" }}>{(brief.composite_risk * 100).toFixed(1)}%</div>
@@ -207,7 +216,7 @@ export default function AstronautPage({ flight, setFlight }) {
         </div>
 
         {/* ROW 1: System Scores + Timeline | Cascade Alerts + Interventions */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", alignItems: "start", marginBottom: "0" }}>
+        <div className="ak-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", alignItems: "start", marginBottom: "0" }}>
           <div>
             <div style={card}>
               <div style={cardTitle}>System Risk Indices</div>
@@ -281,7 +290,7 @@ export default function AstronautPage({ flight, setFlight }) {
         {/* ROW 2: Mars Forecast FULL WIDTH — 4 columns, one per system */}
         <div style={card}>
           <div style={cardTitle}>{flight ? "MARS MISSION TRAJECTORY — 180D SIMULATION" : "Mars Mission Trajectory (180-day simulation)"}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.75rem" }}>
+          <div className="ak-five-col" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.75rem" }}>
             {forecast?.mars_mission_forecast?.map(sys => {
               const sysColor = SYSTEM_COLORS[sys.system] || "#64748b"
               return (
@@ -326,7 +335,7 @@ export default function AstronautPage({ flight, setFlight }) {
               {flight ? "> NO RULES FIRED. ALL BIOMARKERS WITHIN CLINICAL THRESHOLDS." : "✓ No clinical rules fired — all biomarkers within normal thresholds"}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div className="ak-rules-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               {brief.deterministic_rules.map((rule, i) => {
                 const ruleKey = `${rule.biomarker}_${rule.tier}`
                 const tColor = TIER_COLORS[rule.tier] || "#64748b"
@@ -365,7 +374,7 @@ export default function AstronautPage({ flight, setFlight }) {
         </div>
 
         {/* ROW 4: Action Log | Confidence — FULL WIDTH 2 COLUMNS */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+        <div className="ak-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
 
           <div style={card}>
             <div style={cardTitle}>{flight ? "COMMANDER ACTION LOG — TRACEABILITY" : "Commander Action Log"}</div>
