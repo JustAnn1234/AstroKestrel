@@ -558,3 +558,98 @@ You are speaking to a mission commander or flight surgeon. Be direct and factual
         "guardian_screened": False,
         "disclaimer": ""
     }
+
+
+# ─────────────────────────────────────────────────────────────
+# FHIR R4 EXPORT
+# ─────────────────────────────────────────────────────────────
+
+@app.get("/api/astronaut/{astronaut_id}/fhir-export")
+def get_fhir_export(astronaut_id: str):
+    """
+    Export astronaut health summary in FHIR R4-compatible format.
+    Structured for integration with Electronic Health Record systems.
+    """
+    import datetime
+
+    aid = astronaut_id.upper()
+    data = mission_results[mission_results['astronaut_id'] == aid]
+    if data.empty:
+        return {"error": "Astronaut not found"}
+
+    latest = data.sort_values('day').iloc[-1]
+    latest_anomaly = anomaly_results[
+        (anomaly_results['astronaut_id'] == aid) &
+        (anomaly_results['days_from_launch'] == latest['day'])
+    ]
+
+    system_scores = {}
+    for _, row in latest_anomaly.iterrows():
+        system_scores[row['system']] = row['risk_score']
+
+    risk_result = compute_cross_system_risk(system_scores)
+    det_result = deterministic_index.get(aid, {})
+    combined = get_combined_tier(risk_result['composite_risk'], det_result)
+    n = _baseline_sample_count(aid)
+    unc = _uncertainty_for_n(n)
+
+    return {
+        "resourceType": "Bundle",
+        "type": "document",
+        "meta": {
+            "source": "AstroKestrel-MHI-v2.0",
+            "data_source": "NASA OSDR OSD-575 / OSD-530 (Inspiration4)",
+            "generated": datetime.datetime.utcnow().isoformat() + "Z"
+        },
+        "entry": [
+            {
+                "resourceType": "Patient",
+                "id": aid,
+                "identifier": [{"system": "astrokestrel.mission", "value": aid}],
+                "meta": {"mission": "Inspiration4", "data_day": int(latest['day'])}
+            },
+            {
+                "resourceType": "Observation",
+                "id": f"{aid}-composite-risk",
+                "status": "final",
+                "code": {"text": "AstroKestrel Composite Risk Index"},
+                "valueQuantity": {
+                    "value": round(risk_result['composite_risk'] * 100, 1),
+                    "unit": "%",
+                    "uncertainty": f"±{unc['uncertainty_pct']}%"
+                },
+                "interpretation": [{"text": combined['final_tier']}],
+                "note": [{"text": unc['uncertainty_note']}]
+            },
+            {
+                "resourceType": "Observation",
+                "id": f"{aid}-system-scores",
+                "status": "final",
+                "code": {"text": "Multi-System Physiological Risk Scores"},
+                "component": [
+                    {
+                        "code": {"text": system.replace("_", " ").title()},
+                        "valueQuantity": {
+                            "value": round(score * 100, 1),
+                            "unit": "%"
+                        }
+                    }
+                    for system, score in system_scores.items()
+                ]
+            },
+            {
+                "resourceType": "ClinicalImpression",
+                "id": f"{aid}-clinical-impression",
+                "status": "completed",
+                "description": f"Combined tier: {combined['final_tier']}. Tier source: {combined['tier_source']}.",
+                "finding": [
+                    {"itemCodeableConcept": {"text": interaction}}
+                    for interaction in risk_result['interactions_triggered']
+                ],
+                "note": [
+                    {"text": rule['significance']}
+                    for rule in det_result.get('fired_rules', [])[:3]
+                ]
+            }
+        ]
+    }

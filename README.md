@@ -116,11 +116,24 @@ Current space missions already collect the data AstroKestrel needs:
 - **Pathway 2 — Axiom Space / SpaceX Civilian Missions:** Axiom Space runs private astronaut missions to the ISS with crews who lack years of medical preparation. AstroKestrel's CMO-support model — monitoring civilian physiological responses, generating plain-language intervention recommendations — directly addresses the medical risk gap in civilian spaceflight.
 - **Pathway 3 — Deep Space Medical Officer Training:** AstroKestrel's simulation mode (drag a slider from Day 1 to Day 500) provides a training environment for flight surgeons to build intuition about multi-system deterioration cascades before managing real crew members on long-duration missions.
 
+### API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/dashboard` | Full crew risk overview — all 4 astronauts |
+| `GET /api/astronaut/{id}/brief` | Deep per-astronaut risk brief with dual-engine output |
+| `GET /api/astronaut/{id}/timeline` | Risk trajectory across all mission timepoints |
+| `GET /api/astronaut/{id}/forecast` | Mars mission risk forecast to Day 500 |
+| `GET /api/astronaut/{id}/biomarkers` | Individual biomarker values with clinical context |
+| `GET /api/astronaut/{id}/fhir-export` | **FHIR R4-compatible health bundle** for EHR integration |
+| `GET /api/alerts` | All CRITICAL/HIGH alerts across the crew |
+| `POST /api/chat` | IBM Granite clinical briefing assistant |
+
 ### Integration Requirements for Production Deployment
 
 - **Real-time wearable data stream** → replace periodic sample readings with continuous telemetry
 - **On-board edge compute** → deploy ML models locally on spacecraft hardware (already offline-capable)
-- **Electronic Health Record integration** → log all alerts, acknowledgements, and interventions to mission medical record
+- **Electronic Health Record integration** → AstroKestrel already exports FHIR R4-compatible Bundles (`/api/astronaut/{id}/fhir-export`) — structured for direct ingestion by any FHIR-compliant EHR system
 - **Federated learning** → train improved models across multiple missions without centralising private medical data (IBM watsonx.data architecture)
 
 ---
@@ -156,7 +169,6 @@ Current space missions already collect the data AstroKestrel needs:
 - **Direct radiation dosimetry** — replace proxy markers with actual cumulative dose measurements from active dosimeters
 - **Federated learning** — train improved models across multiple missions without centralising private health data
 - **Validated Mars trajectories** — retrain forecast models on ISS 6-month mission datasets for scientifically validated long-duration projections
-- **Electronic Health Record export** — structured FHIR-format export of all alerts and interventions for mission medical record
 
 ---
 
@@ -190,7 +202,7 @@ Mars Mission Forecasting (forecast.py)
    • Up to 500-day extrapolation
          │
          ▼
-FastAPI Backend — 7 endpoints
+FastAPI Backend — 8 endpoints
          │
          ▼
 React 19 Dashboard
