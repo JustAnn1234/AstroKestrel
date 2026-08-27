@@ -311,6 +311,8 @@ Open `http://localhost:5173`
 
 AstroKestrel transforms space medicine from reactive symptom management to proactive physiological surveillance — advancing mission safety for the first generation of humans who will travel beyond Earth's orbit to Mars.
 
+We are entering an era where humans — not just trained astronauts, but civilians, scientists, explorers — will travel beyond Earth to experience the beauty of space and other worlds. That is extraordinary. And as we open the cosmos to more people, their health deserves the same level of care and intelligence we bring to the mission itself. That is what AstroKestrel is for.
+
 ---
 
 ## About
