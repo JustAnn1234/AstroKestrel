@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Dynamic project root path resolution — resolves relative to this file's location
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data" / "raw"
+DATA_DIR = BASE_DIR / "data" / "Raw"
 
 def parse_timepoint(sample_name):
     parts = sample_name.split("_")
