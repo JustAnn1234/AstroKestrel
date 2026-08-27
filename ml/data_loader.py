@@ -3,19 +3,10 @@ import numpy as np
 import os
 
 from pathlib import Path
-import pandas as pd
 
-# Dynamic project root path resolution
+# Dynamic project root path resolution — resolves relative to this file's location
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data" / "raw"
-
-def load_metabolic():
-    file_path = DATA_DIR / "LSDS-8_Comprehensive_Metabolic_Panel_CMP_TRANSFORMED.csv"
-    return pd.read_csv(file_path)
-
-# Ensure all dataset loaders in this file use DATA_DIR instead of relative string paths
-
-DATA_PATH = "data/raw/"
 
 def parse_timepoint(sample_name):
     parts = sample_name.split("_")
@@ -41,7 +32,7 @@ def parse_timepoint(sample_name):
     return astronaut_id, days, phase
 
 def load_metabolic():
-    df = pd.read_csv(DATA_PATH + "LSDS-8_Comprehensive_Metabolic_Panel_CMP_TRANSFORMED.csv")
+    df = pd.read_csv(DATA_DIR / "LSDS-8_Comprehensive_Metabolic_Panel_CMP_TRANSFORMED.csv")
     
     value_cols = [c for c in df.columns if c.endswith('_value') or 
                   ('_value_' in c and '_range_' not in c)]
@@ -57,7 +48,7 @@ def load_metabolic():
     return df
 
 def load_cardiovascular():
-    df = pd.read_csv(DATA_PATH + "LSDS-8_Multiplex_serum_cardiovascular_EvePanel_TRANSFORMED.csv")
+    df = pd.read_csv(DATA_DIR / "LSDS-8_Multiplex_serum_cardiovascular_EvePanel_TRANSFORMED.csv")
     
     keep = ['Sample Name'] + [c for c in df.columns if '_concentration_' in c]
     df = df[keep].copy()
@@ -70,7 +61,7 @@ def load_cardiovascular():
     return df
 
 def load_immune():
-    df = pd.read_csv(DATA_PATH + "LSDS-8_Multiplex_serum_immune_EvePanel_TRANSFORMED.csv")
+    df = pd.read_csv(DATA_DIR / "LSDS-8_Multiplex_serum_immune_EvePanel_TRANSFORMED.csv")
     
     key_cytokines = [
         'il_6_concentration_picogram_per_milliliter',
