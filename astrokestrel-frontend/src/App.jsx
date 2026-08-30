@@ -34,8 +34,8 @@ function getRiskColor(score) {
 
 const modernStyles = {
   app: { fontFamily: "'Inter', system-ui, sans-serif", background: "#0a0e1a", minHeight: "100vh", color: "#e2e8f0" },
-  nav: { background: "rgba(13,18,35,0.95)", borderBottom: "1px solid rgba(99,102,241,0.2)", padding: "0 2rem", backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" },
+  nav: { background: "rgba(13,18,35,0.95)", borderBottom: "1px solid rgba(99,102,241,0.2)", padding: "0 1.5rem", backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 100 },
+  navInner: { maxWidth: "100%", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" },
   logoText: { fontSize: "20px", fontWeight: 700, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
   logoSub: { fontSize: "11px", color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase" },
   card: { background: "rgba(13,18,35,0.8)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: "16px", padding: "1.25rem 1.5rem", backdropFilter: "blur(10px)", marginBottom: "1rem" },
@@ -46,8 +46,8 @@ const modernStyles = {
 
 const flightStyles = {
   app: { fontFamily: "'Share Tech Mono', 'Space Mono', monospace", background: "#000a0a", minHeight: "100vh", color: "#00ff88" },
-  nav: { background: "#000d0d", borderBottom: "1px solid #00ff8840", padding: "0 2rem", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1400px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "56px" },
+  nav: { background: "#000d0d", borderBottom: "1px solid #00ff8840", padding: "0 1.5rem", position: "sticky", top: 0, zIndex: 100 },
+  navInner: { maxWidth: "100%", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "56px" },
   logoText: { fontSize: "18px", fontWeight: 400, color: "#00ff88", letterSpacing: "0.15em" },
   logoSub: { fontSize: "10px", color: "#00aa55", letterSpacing: "0.2em" },
   card: { background: "#000d0d", border: "1px solid #00ff8830", borderRadius: "4px", padding: "1rem 1.25rem", marginBottom: "1rem" },
@@ -674,10 +674,18 @@ function Dashboard({ flight, setFlight }) {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: ${flight ? "#00ff8830" : "rgba(99,102,241,0.3)"}; border-radius: 2px; }
         ${flight ? "* { text-shadow: 0 0 8px rgba(0,255,136,0.2); } body { background: #000a0a; }" : ""}
+        @media (max-width: 768px) {
+          .ak-db-main { padding: 1rem !important; }
+          .ak-db-nav { padding: 0 1rem !important; }
+          .ak-db-nav-inner { flex-wrap: wrap; height: auto !important; gap: 8px !important; padding: 8px 0 !important; }
+          .ak-db-nav-right { flex-wrap: wrap; gap: 8px !important; }
+          .ak-metric-grid { grid-template-columns: 1fr 1fr !important; }
+          .ak-crew-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
-      <nav style={s.nav}>
-        <div style={s.navInner}>
+      <nav className="ak-db-nav" style={s.nav}>
+        <div className="ak-db-nav-inner" style={s.navInner}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span style={{ fontSize: "24px" }}>🦅</span>
             <div>
@@ -685,7 +693,7 @@ function Dashboard({ flight, setFlight }) {
               <div style={s.logoSub}>{flight ? "MISSION HEALTH INTELLIGENCE SYS v2.0" : "Crew Health Surveillance & Decision Support"}</div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <div className="ak-db-nav-right" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
             <METClock flight={flight} />
             <button onClick={() => setFlight(!flight)} style={{ background: "transparent", border: `1px solid ${flight ? "#00ff88" : "rgba(99,102,241,0.4)"}`, borderRadius: flight ? "2px" : "8px", padding: "6px 14px", color: flight ? "#00ff88" : "#6366f1", fontSize: "11px", fontFamily: flight ? "monospace" : "inherit", cursor: "pointer", letterSpacing: flight ? "0.1em" : 0 }}>
               {flight ? "[SWITCH: MODERN]" : "Flight Display"}
@@ -703,14 +711,14 @@ function Dashboard({ flight, setFlight }) {
         </div>
       </nav>
 
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "1.5rem 2rem" }}>
+      <main className="ak-db-main" style={{ maxWidth: "100%", padding: "1.5rem 2rem" }}>
         {flight && (
           <div style={{ fontFamily: "monospace", fontSize: "10px", color: "#00aa55", marginBottom: "1rem", letterSpacing: "0.08em" }}>
             SYSTEM: ASTROKESTREL-MHI-v2.0 | DATA: NASA-OSDR OSD-575/OSD-530 | CREW: INSPIRATION4 | ML+DETERMINISTIC: OFFLINE-CAPABLE | CHAT: CLOUD-DEPENDENT | STATUS: NOMINAL
           </div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "1.5rem" }}>
+        <div className="ak-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "1.5rem" }}>
           {[
             { label: flight ? "CREW MONITORED" : "Crew Monitored", value: dashboard.total_astronauts, sub: flight ? "INSPIRATION4 MISSION" : "Inspiration4 mission" },
             { label: flight ? "ACTIVE ALERTS" : "Active Alerts", value: dashboard.critical_alerts, sub: flight ? "REQ. COMMANDER ATTENTION" : "requiring attention", danger: dashboard.critical_alerts > 0 },
@@ -748,7 +756,7 @@ function Dashboard({ flight, setFlight }) {
             : "Click any crew card to view their mission intelligence on the right. Use 'Full Report →' for the complete health deep-dive."}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: "1.5rem" }}>
+        <div className="ak-crew-grid" style={{ display: "grid", gridTemplateColumns: "380px 1fr", gap: "1.5rem" }}>
           <div>
             <div style={s.sectionLabel}>{flight ? "CREW HEALTH STATUS" : "Crew Status"}</div>
             {dashboard.crew.map(astronaut => (
