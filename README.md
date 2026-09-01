@@ -198,6 +198,35 @@ Current space missions already collect the data AstroKestrel needs:
 
 ---
 
+## How IBM Bob Was Used
+
+IBM Bob served as the **primary AI development assistant** throughout the entire AstroKestrel build — from initial architecture through to deployment debugging. 28 out of 40 available Bobcoins were consumed across the project, reflecting sustained, heavy usage.
+
+### Key Contributions
+
+| Area | What IBM Bob Did |
+|------|-----------------|
+| **Deployment debugging** | Diagnosed the Render `FileNotFoundError` — identified `data/raw` vs `data/Raw` Linux case-sensitivity mismatch and applied the fix to `ml/data_loader.py` |
+| **Data pipeline** | Identified that NASA CSV datasets had never been committed to git despite appearing locally; guided the `git add -f` resolution |
+| **Path resolution** | Refactored `DATA_PATH` string concatenation to `pathlib.Path(__file__).resolve()` for deployment-safe absolute path resolution |
+| **API architecture** | Designed and implemented all 8 FastAPI endpoints including the FHIR R4 export endpoint |
+| **ML modules** | Structured all five ML analysis modules (`anomaly.py`, `risk_engine.py`, `forecast.py`, `sans.py`, `radiation.py`) and their integration in `api/main.py` |
+| **Frontend fixes** | Fixed hardcoded `localhost:8000` API URL in `AstronautPage.jsx`; added mobile responsive breakpoints across both pages |
+| **README** | Drafted, structured, and iteratively refined the entire README documentation |
+| **Code review** | Audited all files for bugs, duplicate functions, and unused imports throughout the build |
+
+### Proof of Usage
+
+- 📊 **IBM Admin Console — Bobcoin Usage:** [View screenshot](docs/ibm-bob-evidence/screenshot-bobcoin-admin-console.png) — 28/40 Bobcoins spent
+- 💬 **Bobcoin in-app popup:** [View screenshot](docs/ibm-bob-evidence/screenshot-bobcoin-28-40.png) — 28.17/40 Bobcoins spent, 29% budget remaining
+- 🗂️ **Git/CSV resolution:** [View screenshot](docs/ibm-bob-evidence/screenshot-csv-git-fix.png) — Bob diagnosing untracked dataset files
+- 📝 **HTML audit session:** [View screenshot](docs/ibm-bob-evidence/screenshot-bob-html-audit.png) — Bob auditing Menu.html, 9 issues found across 4 severity levels
+- 📈 **Token usage:** [View screenshot](docs/ibm-bob-evidence/screenshot-token-usage-207k.png) — 207k/270k tokens used (77% full context)
+
+> Full evidence folder: [`docs/ibm-bob-evidence/`](docs/ibm-bob-evidence/)
+
+---
+
 ## Technical Limitations & Scientific Disclosure
 
 | Limitation | Detail |
