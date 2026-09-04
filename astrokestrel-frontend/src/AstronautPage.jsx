@@ -69,7 +69,7 @@ export default function AstronautPage({ flight, setFlight }) {
   const surface = flight ? "#000d0d" : "rgba(13,18,35,0.8)"
   const border = flight ? "rgba(0,255,136,0.15)" : "rgba(99,102,241,0.15)"
   const text = flight ? "#00ff88" : "#e2e8f0"
-  const muted = flight ? "#00aa55" : "#64748b"
+  const muted = flight ? "#00aa55" : "#94a3b8"
   const ff = flight ? "'Share Tech Mono', monospace" : "system-ui, sans-serif"
   const accent = flight ? "#00ff88" : "#6366f1"
 

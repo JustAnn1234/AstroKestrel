@@ -37,11 +37,11 @@ const modernStyles = {
   nav: { background: "rgba(13,18,35,0.95)", borderBottom: "1px solid rgba(99,102,241,0.2)", padding: "0 1.5rem", backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 100 },
   navInner: { maxWidth: "100%", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" },
   logoText: { fontSize: "20px", fontWeight: 700, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
-  logoSub: { fontSize: "11px", color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase" },
+  logoSub: { fontSize: "11px", color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase" },
   card: { background: "rgba(13,18,35,0.8)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: "16px", padding: "1.25rem 1.5rem", backdropFilter: "blur(10px)", marginBottom: "1rem" },
   metricCard: { background: "rgba(13,18,35,0.8)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: "16px", padding: "1.25rem 1.5rem" },
-  cardTitle: { fontSize: "13px", fontWeight: 600, color: "#94a3b8", marginBottom: "1rem" },
-  sectionLabel: { fontSize: "11px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" },
+  cardTitle: { fontSize: "13px", fontWeight: 600, color: "#b8c5d6", marginBottom: "1rem" },
+  sectionLabel: { fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" },
 }
 
 const flightStyles = {
@@ -77,7 +77,7 @@ function METClock({ flight }) {
   }
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: "9px", color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase" }}>Mission Elapsed Time</div>
+      <div style={{ fontSize: "9px", color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase" }}>Mission Elapsed Time</div>
       <div style={{ fontSize: "14px", fontFamily: "'Space Mono', monospace", color: "#6366f1", letterSpacing: "0.05em" }}>{hh}:{mm}:{ss}</div>
     </div>
   )
@@ -108,9 +108,9 @@ function RiskBar({ value, system, unit = "Risk Index", flight }) {
   return (
     <div style={{ marginBottom: "12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-        <span style={{ fontSize: "12px", color: "#94a3b8", textTransform: "capitalize" }}>{system}</span>
+        <span style={{ fontSize: "12px", color: "#b8c5d6", textTransform: "capitalize" }}>{system}</span>
         <span style={{ fontSize: "12px", fontWeight: 700, color, fontFamily: "'Space Mono', monospace" }}>
-          {pct}% <span style={{ fontSize: "10px", color: "#475569" }}>({unit})</span>
+          {pct}% <span style={{ fontSize: "10px", color: "#8899aa" }}>({unit})</span>
         </span>
       </div>
       <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "4px", height: "4px" }}>
@@ -175,7 +175,7 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
           <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: `${color}20`, border: `1px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color }}>{astronaut.id.slice(-2)}</div>
           <div>
             <div style={{ fontWeight: 600, fontSize: "14px", color: "#e2e8f0" }}>{astronaut.name}</div>
-            <div style={{ fontSize: "11px", color: "#475569" }}>Day {astronaut.latest_day} post-return</div>
+            <div style={{ fontSize: "11px", color: "#8899aa" }}>Day {astronaut.latest_day} post-return</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
@@ -185,7 +185,7 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
             </span>
           )}
           {isSuppressed && (
-            <span style={{ fontSize: "9px", color: "#475569", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", padding: "2px 6px", borderRadius: "999px" }}>
+            <span style={{ fontSize: "9px", color: "#8899aa", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", padding: "2px 6px", borderRadius: "999px" }}>
               acked
             </span>
           )}
@@ -197,9 +197,9 @@ function AstronautCard({ astronaut, selected, onClick, flight }) {
       ))}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div>
-          <span style={{ fontSize: "11px", color: "#475569" }}>Composite risk</span>
+          <span style={{ fontSize: "11px", color: "#8899aa" }}>Composite risk</span>
           {astronaut.uncertainty_pct && (
-            <div style={{ fontSize: "9px", color: "#334155", marginTop: "2px" }}>
+            <div style={{ fontSize: "9px", color: "#64748b", marginTop: "2px" }}>
               ±{astronaut.uncertainty_pct}% uncertainty
             </div>
           )}
@@ -240,7 +240,7 @@ function SimulationSlider({ astronautId, flight }) {
         </div>
       </div>
       <input type="range" min="1" max="500" value={missionDays} onChange={e => setMissionDays(Number(e.target.value))} style={{ width: "100%", marginBottom: "1rem", accentColor: flight ? "#00ff88" : "#6366f1" }} />
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: flight ? "#00aa55" : "#475569", marginBottom: "1rem", marginTop: "-0.5rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: flight ? "#00aa55" : "#8899aa", marginBottom: "1rem", marginTop: "-0.5rem" }}>
         <span>T+001</span><span>ISS (~180d)</span><span>MARS TRANSIT (~500d)</span>
       </div>
       {forecast.mars_mission_forecast.map(sys => {
@@ -269,10 +269,10 @@ function RadarPanel({ crew, flight }) {
       <ResponsiveContainer width="100%" height={260}>
         <RadarChart data={data}>
           <PolarGrid stroke={flight ? "#00ff8820" : "rgba(255,255,255,0.08)"} />
-          <PolarAngleAxis dataKey="system" tick={{ fill: flight ? "#00aa55" : "#64748b", fontSize: 11 }} />
-          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: flight ? "#006633" : "#475569", fontSize: 9 }} />
+          <PolarAngleAxis dataKey="system" tick={{ fill: flight ? "#00aa55" : "#94a3b8", fontSize: 11 }} />
+          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: flight ? "#006633" : "#8899aa", fontSize: 9 }} />
           {crew.map((a, i) => <Radar key={a.id} name={a.id} dataKey={a.id} stroke={colors[i]} fill={colors[i]} fillOpacity={0.08} strokeWidth={2} />)}
-          <Legend wrapperStyle={{ fontSize: "11px", color: flight ? "#00aa55" : "#94a3b8" }} />
+          <Legend wrapperStyle={{ fontSize: "11px", color: flight ? "#00aa55" : "#b8c5d6" }} />
           <Tooltip contentStyle={{ background: flight ? "#000d0d" : "#0d1223", border: `1px solid ${flight ? "#00ff8830" : "rgba(99,102,241,0.2)"}`, borderRadius: flight ? "2px" : "8px", color: flight ? "#00ff88" : "#e2e8f0" }} />
         </RadarChart>
       </ResponsiveContainer>
@@ -295,8 +295,8 @@ function TimelineChart({ astronautId, flight }) {
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray={flight ? "1 4" : "3 3"} stroke={flight ? "#00ff8815" : "rgba(255,255,255,0.05)"} />
-          <XAxis dataKey="day" tick={{ fill: flight ? "#00aa55" : "#64748b", fontSize: 10 }} />
-          <YAxis domain={[0, 100]} tick={{ fill: flight ? "#00aa55" : "#64748b", fontSize: 10 }} unit="%" />
+          <XAxis dataKey="day" tick={{ fill: flight ? "#00aa55" : "#94a3b8", fontSize: 10 }} />
+          <YAxis domain={[0, 100]} tick={{ fill: flight ? "#00aa55" : "#94a3b8", fontSize: 10 }} unit="%" />
           <Tooltip contentStyle={{ background: flight ? "#000d0d" : "#0d1223", border: `1px solid ${flight ? "#00ff8830" : "rgba(99,102,241,0.2)"}`, borderRadius: "4px", color: flight ? "#00ff88" : "#e2e8f0" }} formatter={(v) => [`${v}%`, "CRI"]} />
           <ReferenceLine y={75} stroke="#ef444460" strokeDasharray="4 4" label={{ value: "CRIT", fontSize: 9, fill: "#ef4444" }} />
           <ReferenceLine y={55} stroke="#f9731660" strokeDasharray="4 4" label={{ value: "HIGH", fontSize: 9, fill: "#f97316" }} />
@@ -334,8 +334,8 @@ function BriefPanel({ astronautId, flight }) {
           <div key={i} style={{ display: "flex", gap: "12px", padding: "10px 0", borderBottom: i < brief.interventions.length - 1 ? `1px solid ${flight ? "#00ff8815" : "rgba(255,255,255,0.05)"}` : "none" }}>
             <span style={{ fontSize: "10px", padding: "3px 8px", borderRadius: flight ? "2px" : "6px", height: "fit-content", whiteSpace: "nowrap", background: `${RISK_COLORS[iv.priority] || "#64748b"}15`, color: RISK_COLORS[iv.priority] || "#64748b", border: `1px solid ${RISK_COLORS[iv.priority] || "#64748b"}40` }}>{iv.priority}</span>
             <div>
-              <div style={{ fontSize: "11px", color: flight ? "#00aa55" : "#94a3b8", marginBottom: "4px" }}>{flight ? `[${iv.system.toUpperCase()}]` : iv.system}</div>
-              <div style={{ fontSize: "11px", color: flight ? "#007744" : "#64748b", lineHeight: "1.6" }}>{iv.action}</div>
+              <div style={{ fontSize: "11px", color: flight ? "#00aa55" : "#b8c5d6", marginBottom: "4px" }}>{flight ? `[${iv.system.toUpperCase()}]` : iv.system}</div>
+              <div style={{ fontSize: "11px", color: flight ? "#007744" : "#94a3b8", lineHeight: "1.6" }}>{iv.action}</div>
             </div>
           </div>
         ))
@@ -372,14 +372,14 @@ function BiomarkerExplainer({ astronautId, flight }) {
     <div style={s.card}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
         <div style={s.cardTitle}>{flight ? "BIOMARKER EVIDENCE CHAIN — EXPLAINABILITY LAYER" : "Biomarker Evidence Chain"}</div>
-        <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#64748b", textAlign: "right" }}>
+        <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#94a3b8", textAlign: "right" }}>
           {data.baseline_samples} baseline samples<br />Confidence: LOW
         </div>
       </div>
 
       {data.overall_deterministic_tier && (
         <div style={{ background: `${tierColors[data.overall_deterministic_tier]}10`, border: `1px solid ${tierColors[data.overall_deterministic_tier]}40`, borderRadius: flight ? "2px" : "8px", padding: "8px 12px", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "11px", color: flight ? "#00aa55" : "#94a3b8" }}>{flight ? "DETERMINISTIC RULES ENGINE:" : "Deterministic rules engine:"}</span>
+          <span style={{ fontSize: "11px", color: flight ? "#00aa55" : "#b8c5d6" }}>{flight ? "DETERMINISTIC RULES ENGINE:" : "Deterministic rules engine:"}</span>
           <span style={{ fontSize: "11px", fontWeight: 700, color: tierColors[data.overall_deterministic_tier], letterSpacing: "0.05em" }}>
             {flight ? `[${data.overall_deterministic_tier}]` : data.overall_deterministic_tier.replace(/_/g, " ")}
           </span>
@@ -399,7 +399,7 @@ function BiomarkerExplainer({ astronautId, flight }) {
               <span>{flight ? systemLabels[system].toUpperCase() : systemLabels[system]}</span>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 {firedCount > 0 && <span style={{ fontSize: "10px", color: tierColors[topTier] }}>{firedCount} rule{firedCount > 1 ? 's' : ''} fired</span>}
-                <span style={{ color: flight ? "#00aa55" : "#64748b", fontSize: "12px" }}>{isExpanded ? "▲" : "▼"}</span>
+                <span style={{ color: flight ? "#00aa55" : "#94a3b8", fontSize: "12px" }}>{isExpanded ? "▲" : "▼"}</span>
               </div>
             </button>
 
@@ -421,16 +421,16 @@ function BiomarkerExplainer({ astronautId, flight }) {
                               </span>
                             )}
                           </div>
-                          <div style={{ fontSize: "10px", color: flight ? "#006633" : "#475569" }}>{flight ? b.unit.toUpperCase() : b.unit}</div>
+                          <div style={{ fontSize: "10px", color: flight ? "#006633" : "#8899aa" }}>{flight ? b.unit.toUpperCase() : b.unit}</div>
                         </div>
                         <div style={{ textAlign: "right", minWidth: "120px" }}>
                           <div style={{ fontSize: "14px", fontWeight: 600, color: b.deterministic_rule_fired ? tierColors[b.deterministic_tier] : (flight ? "#00ff88" : "#e2e8f0"), fontFamily: "monospace" }}>
                             {b.current_value > 1000000 ? `${(b.current_value / 1000000).toFixed(2)}M` : b.current_value > 1000 ? `${(b.current_value / 1000).toFixed(1)}k` : b.current_value}
                           </div>
-                          <div style={{ fontSize: "10px", color: flight ? "#006633" : "#475569", fontFamily: "monospace" }}>
+                          <div style={{ fontSize: "10px", color: flight ? "#006633" : "#8899aa", fontFamily: "monospace" }}>
                             baseline: {b.baseline_mean > 1000000 ? `${(b.baseline_mean / 1000000).toFixed(2)}M` : b.baseline_mean > 1000 ? `${(b.baseline_mean / 1000).toFixed(1)}k` : b.baseline_mean.toFixed(2)}
                           </div>
-                          <div style={{ fontSize: "10px", color: Math.abs(b.z_score) >= 2 ? "#f97316" : (flight ? "#006633" : "#475569"), fontFamily: "monospace" }}>
+                          <div style={{ fontSize: "10px", color: Math.abs(b.z_score) >= 2 ? "#f97316" : (flight ? "#006633" : "#8899aa"), fontFamily: "monospace" }}>
                             z = {b.z_score > 0 ? "+" : ""}{b.z_score}σ
                           </div>
                         </div>
@@ -439,10 +439,10 @@ function BiomarkerExplainer({ astronautId, flight }) {
                         <div style={{ flex: 1, height: "3px", background: flight ? "rgba(0,255,136,0.1)" : "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
                           <div style={{ width: `${zBar.pct}%`, height: "100%", background: zBar.color, borderRadius: "2px", boxShadow: `0 0 4px ${zBar.color}60` }} />
                         </div>
-                        <span style={{ fontSize: "9px", color: flight ? "#006633" : "#475569", fontFamily: "monospace", minWidth: "40px" }}>{Math.abs(b.z_score).toFixed(1)}σ</span>
+                        <span style={{ fontSize: "9px", color: flight ? "#006633" : "#8899aa", fontFamily: "monospace", minWidth: "40px" }}>{Math.abs(b.z_score).toFixed(1)}σ</span>
                       </div>
                       {b.deterministic_rule_fired && (
-                        <div style={{ fontSize: "11px", color: flight ? "#007744" : "#64748b", lineHeight: "1.5", borderLeft: `2px solid ${tierColors[b.deterministic_tier]}40`, paddingLeft: "8px", marginTop: "4px" }}>
+                        <div style={{ fontSize: "11px", color: flight ? "#007744" : "#94a3b8", lineHeight: "1.5", borderLeft: `2px solid ${tierColors[b.deterministic_tier]}40`, paddingLeft: "8px", marginTop: "4px" }}>
                           {b.significance}
                         </div>
                       )}
@@ -455,7 +455,7 @@ function BiomarkerExplainer({ astronautId, flight }) {
         )
       })}
 
-      <div style={{ fontSize: "10px", color: flight ? "#004422" : "#334155", marginTop: "12px", paddingTop: "10px", borderTop: `1px solid ${flight ? "#00ff8810" : "rgba(255,255,255,0.05)"}`, lineHeight: "1.5" }}>
+      <div style={{ fontSize: "10px", color: flight ? "#004422" : "#7c8a99", marginTop: "12px", paddingTop: "10px", borderTop: `1px solid ${flight ? "#00ff8810" : "rgba(255,255,255,0.05)"}`, lineHeight: "1.5" }}>
         {data.data_note}
       </div>
     </div>
@@ -552,9 +552,9 @@ function FloatingChat({ dashboardData, flight }) {
           <div onMouseDown={startDrag} style={{ padding: "14px 16px", borderBottom: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: flight ? "#001a0a" : "rgba(99,102,241,0.08)", borderRadius: flight ? "4px 4px 0 0" : "16px 16px 0 0", cursor: "grab", userSelect: "none" }}>
             <div>
               <div style={{ fontSize: "13px", fontWeight: 600, color: accent, fontFamily: ff, letterSpacing: flight ? "0.1em" : 0 }}>{flight ? "MISSION AI — ASTROKESTREL" : "Ask AstroKestrel"}</div>
-              <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#64748b", marginTop: "2px", fontFamily: ff }}>{flight ? "DRAG HEADER TO MOVE" : "Drag header to move"}</div>
+              <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#94a3b8", marginTop: "2px", fontFamily: ff }}>{flight ? "DRAG HEADER TO MOVE" : "Drag header to move"}</div>
             </div>
-            <button onClick={(e) => { e.stopPropagation(); setOpen(false) }} style={{ background: "transparent", border: "none", color: flight ? "#00aa55" : "#64748b", fontSize: "20px", cursor: "pointer", lineHeight: 1, padding: "0 4px" }}>×</button>
+            <button onClick={(e) => { e.stopPropagation(); setOpen(false) }} style={{ background: "transparent", border: "none", color: flight ? "#00aa55" : "#94a3b8", fontSize: "20px", cursor: "pointer", lineHeight: 1, padding: "0 4px" }}>×</button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
             {messages.map((m, i) => (
@@ -564,7 +564,7 @@ function FloatingChat({ dashboardData, flight }) {
                 </div>
               </div>
             ))}
-            {loading && <div style={{ fontSize: "11px", color: flight ? "#00aa55" : "#475569", fontFamily: ff }}>{flight ? "> PROCESSING BIOTELEMETRY..." : "Analysing mission data..."}</div>}
+            {loading && <div style={{ fontSize: "11px", color: flight ? "#00aa55" : "#8899aa", fontFamily: ff }}>{flight ? "> PROCESSING BIOTELEMETRY..." : "Analysing mission data..."}</div>}
             <div ref={messagesEndRef} />
           </div>
           <div style={{ padding: "10px 12px", borderTop: `1px solid ${border}`, display: "flex", gap: "8px" }}>
@@ -726,9 +726,9 @@ function Dashboard({ flight, setFlight }) {
             { label: flight ? "BIOMARKERS" : "Biomarkers", value: "168+", sub: flight ? "NASA OSDR DATASETS" : "NASA OSDR — Inspiration4" }
           ].map(({ label, value, sub, danger }) => (
             <div key={label} style={{ ...s.metricCard, border: `1px solid ${danger ? (flight ? "#ff000040" : "rgba(239,68,68,0.3)") : (flight ? "#00ff8820" : "rgba(99,102,241,0.15)")}` }}>
-              <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>{label}</div>
+              <div style={{ fontSize: "10px", color: flight ? "#00aa55" : "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>{label}</div>
               <div style={{ fontSize: "28px", fontWeight: flight ? 400 : 700, color: danger ? "#ef4444" : (flight ? "#00ff88" : "#e2e8f0"), fontFamily: "'Space Mono', monospace" }}>{value}</div>
-              <div style={{ fontSize: "10px", color: flight ? "#006633" : "#475569", marginTop: "4px" }}>{sub}</div>
+              <div style={{ fontSize: "10px", color: flight ? "#006633" : "#8899aa", marginTop: "4px" }}>{sub}</div>
             </div>
           ))}
         </div>
@@ -736,7 +736,7 @@ function Dashboard({ flight, setFlight }) {
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "0.5rem" }}>
           <div style={{
             fontSize: "10px",
-            color: flight ? "#00aa55" : "#475569",
+            color: flight ? "#00aa55" : "#8899aa",
             background: flight ? "rgba(0,255,136,0.05)" : "rgba(34,197,94,0.05)",
             border: `1px solid ${flight ? "#00ff8820" : "rgba(34,197,94,0.15)"}`,
             borderRadius: flight ? "2px" : "6px",
@@ -750,7 +750,7 @@ function Dashboard({ flight, setFlight }) {
           </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem", fontSize: "11px", color: flight ? "#00aa55" : "#64748b", fontFamily: flight ? "monospace" : "inherit" }}>
+        <div style={{ marginBottom: "0.75rem", fontSize: "11px", color: flight ? "#00aa55" : "#94a3b8", fontFamily: flight ? "monospace" : "inherit" }}>
           {flight
             ? "► CLICK CARD TO SELECT AND VIEW MISSION INTEL. USE 'DEEP DIVE' FOR FULL HEALTH REPORT."
             : "Click any crew card to view their mission intelligence on the right. Use 'Full Report →' for the complete health deep-dive."}
